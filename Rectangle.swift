@@ -106,66 +106,25 @@ struct Rectangle {
 
     // Return the points of intersection between `line` and this rectangle
     func clip(line: Line) -> (PointVector, PointVector)? {
-        // If the line passes through a corner
-        if line.contains(bottomLeft)
-        || line.contains(topRight)
-        || line.contains(PointVector(bottomLeft.x, topRight.y))
-        || line.contains(PointVector(topRight.x,   bottomLeft.y)) {
-            return nil
-        }
-        var leftIntersection:   PointVector!
-        var rightIntersection:  PointVector!
-        var topIntersection:    PointVector!
-        var bottomIntersection: PointVector!
-        var leftIntersects   = false
-        var rightIntersects  = false
-        var topIntersects    = false
-        var bottomIntersects = false
+        var intersections = Set<PointVector>()
         if let leftIn = intersection(line, leftLine) where
                bottomLeft.y <= leftIn.y && leftIn.y <= topRight.y {
-            leftIntersection = leftIn
-            leftIntersects   = true
+            intersections.insert(leftIn)
         }
         if let rightIn = intersection(line, rightLine) where
                bottomLeft.y <= rightIn.y && rightIn.y <= topRight.y {
-            rightIntersection = rightIn
-            rightIntersects   = true
+            intersections.insert(rightIn)
         }
         if let bottomIn = intersection(line, bottomLine) where
                bottomLeft.x <= bottomIn.x && bottomIn.x <= topRight.x {
-            bottomIntersection = bottomIn
-            bottomIntersects   = true
+            intersections.insert(bottomIn)
         }
         if let topIn = intersection(line, topLine) where
                bottomLeft.x <= topIn.x && topIn.x <= topRight.x {
-            topIntersection = topIn
-            topIntersects   = true
+            intersections.insert(topIn)
         }
-        if leftIntersects {
-            if rightIntersects {
-                return (leftIntersection, rightIntersection)
-            }
-            if topIntersects {
-                return (leftIntersection, topIntersection)
-            }
-            if bottomIntersects {
-                return (leftIntersection, bottomIntersection)
-            }
-        }
-        if rightIntersects {
-            if topIntersects {
-                return (rightIntersection, topIntersection)
-            }
-            if bottomIntersects {
-                return (rightIntersection, bottomIntersection)
-            }
-        }
-        if bottomIntersects {
-            if topIntersects {
-                return (bottomIntersection, topIntersection)
-            }
-        }
-        return nil
+        if intersections.count < 2 { return nil }
+        return (intersections.removeFirst(), intersections.removeFirst())
     }
 
     // Return true if either of the two portions of rectangle divided by `line`
