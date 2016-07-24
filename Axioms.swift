@@ -197,9 +197,10 @@ func axiom7(bring p: PointVector, to line1: Line, along line2: Line) -> Line? {
     let u2  = line2.unitNormal
     let u2P = u2.rotatedBy90()
     let foldDistance = (line1.distance - p.dot(u1))
-                     / (2*p.dot(u1)*u1.dot(u2P)) + p.dot(u2P)
+                     / (2*u2P.dot(u1)) + p.dot(u2P)
     let fold = Line(distance: foldDistance, unitNormal: u2P)
-    if (main.paper.encloses(fold.reflectionOf(p)) && main.paper.contains(fold)) {
+    if (main.paper.encloses(fold.reflectionOf(p))
+    && main.paper.contains(fold)) {
         return fold
     }
     return nil

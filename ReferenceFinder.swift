@@ -32,10 +32,10 @@ class ReferenceFinder {
     var maxAspectRatio = 10.0
 
     // Maximum acceptable angle error in degrees of a line to desired line
-    var maxAngleError = 5
+    var maxAngleError = 2.0
 
     // Maximum acceptable shift distance of a line to desired line
-    var maxShiftError = 0.05
+    var maxShiftError = 0.08
 
     // Maximum acceptable distance of a point to desired point
     var maxDistanceError = 0.05
