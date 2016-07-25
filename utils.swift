@@ -299,7 +299,7 @@ func printInstructions(point point: PointReference,
                         lineLabels: [Character] = main.lineLabels)
         -> (pointLabels: [Character], lineLabels: [Character]) {
     if point.label != "_" {
-        return (pointLabels: pointLabels, lineLabels: lineLabels)
+        return (pointLabels, lineLabels)
     }
     var pointLabels = pointLabels
     var lineLabels  = lineLabels
@@ -318,7 +318,7 @@ func printInstructions(point point: PointReference,
     point.label = "point \(pointLabels.popLast()!)\(point.point)"
     print("The intersection between \(line1.label) and \(line2.label)"
         + " creates \(point.label).")
-    return (pointLabels: pointLabels, lineLabels: lineLabels)
+    return (pointLabels, lineLabels)
 }
 
 func printInstructions(line line: LineReference,
@@ -329,7 +329,7 @@ func printInstructions(line line: LineReference,
     var lineLabels  = lineLabels
     if line.axiom == nil {
         line.label = "line \(lineLabels.popLast()!)(\(line.line))"
-        return (pointLabels: pointLabels, lineLabels: lineLabels)
+        return (pointLabels, lineLabels)
     }
     switch line.axiom! {
     case .A1(let point1, let point2):
@@ -452,7 +452,7 @@ func printInstructions(line line: LineReference,
         print("(A7) Fold \(point1.label) onto \(line1.label)"
             + " perpendicular to \(line2.label), creating line \(line.label)")
     }
-    return (pointLabels: pointLabels, lineLabels: lineLabels)
+    return (pointLabels, lineLabels)
 }
 
 // Get a list of every possible pair from the set
