@@ -1,96 +1,85 @@
 import Darwin
 
 // String passed into this function must start with "." or a digit
-func parseDouble(str: String) -> (number: Double, remaining: String)? {
-    var str = str
+func parseDouble(inout str: String) -> Double? {
     var double = 0.0
     var char = str.removeAtIndex(str.startIndex)
     if char == "." {
-        if str.isEmpty { return nil }
-        char = str.removeAtIndex(str.startIndex)
+        if str.isEmpty {
+            str.insert(char, atIndex: str.startIndex)
+            return nil
+        }
+        let char2 = str[str.startIndex]
 
         // Naked "."
-        if !isDigit(char) {
+        if !isDigit(char2) {
+            str.insert(char, atIndex: str.startIndex)
             return nil
         }
+        double += parseDecimal(&str)
+    }
+    else if isDigit(char) {
         str.insert(char, atIndex: str.startIndex)
-        let parsedDecimal = parseDecimal(str)
-        double += parsedDecimal.number
-        str = parsedDecimal.remaining
+        if let parsedInt = parseInt(&str) {
+            double += Double(parsedInt)
+        }
+        else { return nil }
+        if str.isEmpty { return double }
+        char = str.removeAtIndex(str.startIndex)
+        if char == "." { double += parseDecimal(&str) }
+        else { str.insert(char, atIndex: str.startIndex) }
     }
     else {
-        if !isDigit(char) { return nil }
         str.insert(char, atIndex: str.startIndex)
-        if let parsedInt = parseInt(str) {
-            double += Double(parsedInt.number)
-            str = parsedInt.remaining
-        }
-        else {
-            return nil
-        }
-        if str.isEmpty {
-            return (double, str)
-        }
-        char = str.removeAtIndex(str.startIndex)
-        if char == "." {
-            let parsedDecimal = parseDecimal(str)
-            double += parsedDecimal.number
-            str = parsedDecimal.remaining
-        }
-        else {
-            str.insert(char, atIndex: str.startIndex)
-        }
+        return nil
     }
-    if str.isEmpty {
-        return (double, str)
-    }
+    if str.isEmpty { return double }
     char = str.removeAtIndex(str.startIndex)
     if char != "E" && char != "e" {
         str.insert(char, atIndex: str.startIndex)
-        return (double, str)
+        return double
     }
-    if let parsedExponent = parseExponent(str) {
-        double *= pow(10.0, Double(parsedExponent.number))
-        str = parsedExponent.remaining
+    if let parsedExponent = parseExponent(&str) {
+        double *= pow(10.0, Double(parsedExponent))
     }
-    return (number: double, remaining: str)
+    else {
+        str.insert(char, atIndex: str.startIndex)
+    }
+    return double
 }
 
-func parseExponent(str: String) -> (number: Int, remaining: String)? {
+func parseExponent(inout str: String) -> Int? {
     if str.isEmpty { return nil }
-    var str = str
     let char = str.removeAtIndex(str.startIndex)
     switch char {
     case "+":
-        if let parsedInt = parseInt(str) {
-            return (number: parsedInt.number, remaining: parsedInt.remaining)
+        if let parsedInt = parseInt(&str) {
+            return parsedInt
         }
-        else { break }
+        str.insert(char, atIndex: str.startIndex)
     case "-":
-        if let parsedInt = parseInt(str) {
-            return (number: -parsedInt.number, remaining: parsedInt.remaining)
+        if let parsedInt = parseInt(&str) {
+            return -parsedInt
         }
-        else { break }
+        str.insert(char, atIndex: str.startIndex)
     default:
         str.insert(char, atIndex: str.startIndex)
-        if let parsedInt = parseInt(str) {
-            return (number: parsedInt.number, remaining: parsedInt.remaining)
+        if let parsedInt = parseInt(&str) {
+            return parsedInt
         }
-        else { break }
     }
     return nil
 }
 
 // Return 0 if first character is a non-digit
-func parseDecimal(str: String) -> (number: Double, remaining: String) {
-    if str.isEmpty { return (0, str) }
-    var str = str
+func parseDecimal(inout str: String) -> Double {
+    if str.isEmpty { return 0 }
     var decimal = 0.0
     var multiplier = 0.1
     var char = str.removeAtIndex(str.startIndex)
     if !isDigit(char) {
         str.insert(char, atIndex: str.startIndex)
-        return (0, str)
+        return 0
     }
     repeat {
         decimal += multiplier*Double(toNumber(char)!)
@@ -102,15 +91,17 @@ func parseDecimal(str: String) -> (number: Double, remaining: String) {
     if !isDigit(char) {
         str.insert(char, atIndex: str.startIndex)
     }
-    return (decimal, str)
+    return decimal
 }
 
-func parseInt(str: String) -> (number: Int, remaining: String)? {
+func parseInt(inout str: String) -> Int? {
     if str.isEmpty { return nil }
-    var str = str
     var int = 0
     var char = str.removeAtIndex(str.startIndex)
-    if !isDigit(char) { return nil }
+    if !isDigit(char) {
+        str.insert(char, atIndex: str.startIndex)
+        return nil
+    }
     repeat {
         int = 10*int + toNumber(char)!
         if str.isEmpty { break }
@@ -120,7 +111,7 @@ func parseInt(str: String) -> (number: Int, remaining: String)? {
     if !isDigit(char) {
         str.insert(char, atIndex: str.startIndex)
     }
-    return (int, str)
+    return int
 }
 
 func isDigit(digit: Character) -> Bool {
@@ -128,9 +119,8 @@ func isDigit(digit: Character) -> Bool {
     case "0", "1", "2", "3", "4", "5", "6", "7", "8", "9":
         return true
     default:
-        break
+        return false
     }
-    return false
 }
 
 func toNumber(digit: Character) -> Int? {
