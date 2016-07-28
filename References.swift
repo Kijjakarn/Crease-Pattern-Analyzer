@@ -5,6 +5,8 @@ class PointReference: Hashable {
     let point: PointVector
     let firstLine: LineReference
     let secondLine: LineReference
+    
+    var rank = 0
 
     var distanceError = DBL_MAX
 
@@ -15,10 +17,11 @@ class PointReference: Hashable {
     }
 
     init(_ firstLine: LineReference, _ secondLine: LineReference,
-         _ point: PointVector) {
+         _ point: PointVector, _ rank: Int) {
         self.firstLine  = firstLine
         self.secondLine = secondLine
         self.point      = point
+        self.rank       = rank
     }
 
     init(_ firstLine: LineReference, _ secondLine: LineReference,
@@ -33,6 +36,8 @@ class PointReference: Hashable {
 class LineReference: Hashable {
     let line: Line
     let axiom: Axiom?
+
+    var rank = 0
 
     var shiftError = DBL_MAX
     var angleError = DBL_MAX
@@ -49,13 +54,13 @@ class LineReference: Hashable {
         self.label = label
     }
 
-    init(_ line: Line, _ axiom: Axiom) {
+    init(_ line: Line, _ axiom: Axiom, _ rank: Int) {
         self.line  = line
         self.axiom = axiom
+        self.rank  = rank
     }
 }
 
-// Each case has the same order
 enum Axiom {
     case A1(PointReference, PointReference)
     case A2(PointReference, PointReference)

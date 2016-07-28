@@ -11,6 +11,7 @@ var isParsed = false
 var x = 0.0
 var y = 0.0
 
+print()
 while !isParsed {
     print("x-coordinate: ", terminator: "")
     let str = readLine(stripNewline: true)
@@ -86,16 +87,25 @@ while !isParsed {
 
 main.inputPoint = PointVector(x, y)
 var matchedPts = matchedPoints()
-print("There are \(matchedPts.count) matched points")
+print("\nThere are \(matchedPts.count) matched points:")
 matchedPts.sortInPlace { $0.distanceError < $1.distanceError }
 
 var i = 1
 for matchedPt in matchedPts {
-    print("\(i): \(matchedPt.point),\t\terror = \(matchedPt.distanceError)")
+    print("\(i): rank \(matchedPt.rank), \(matchedPt.point) error = \(matchedPt.distanceError)")
     i += 1
 }
 
-print("\nTo get \(main.inputPoint) (error = \(matchedPts[0].distanceError)),")
-printInstructions(point: matchedPts[0])
+while true {
+    print("\nWhich solution would you like to view? ", terminator: "")
+    var str = readLine(stripNewline: true)
+    if let parsedInt = parseInt(&str!) {
+        if matchedPts.count < parsedInt || parsedInt < 1 {
+            continue
+        }
+        printInstructions(point: matchedPts[parsedInt - 1])
+        clearInstructions()
+    }
+    else { continue }
+}
 
-clearInstructions()

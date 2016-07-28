@@ -21,6 +21,8 @@ func makeAllPointsAndLines() {
     // Use paper's corners as point references and edges as line references
     main.allPoints.append(main.paper.corners)
     main.allLines.append(main.paper.edges)
+    main.numPoints += main.allPoints[0].count
+    main.numLines  += main.allLines[0].count
     var numPoints = 0
     var numLines  = 0
     for rank in 1...main.maxRank {
@@ -29,13 +31,13 @@ func makeAllPointsAndLines() {
         var newLines  = Set<LineReference>()
         for axiom in main.axioms {
             switch axiom {
-            case 1: newLines.unionInPlace(generateAxiom1(rank))
-            case 2: newLines.unionInPlace(generateAxiom2(rank))
-            case 3: newLines.unionInPlace(generateAxiom3(rank))
-            case 4: newLines.unionInPlace(generateAxiom4(rank))
-            case 5: newLines.unionInPlace(generateAxiom5(rank))
-            case 6: newLines.unionInPlace(generateAxiom6(rank))
-            case 7: newLines.unionInPlace(generateAxiom7(rank))
+            case 1: generateAxiom1(rank, &newLines)
+            case 2: generateAxiom2(rank, &newLines)
+            case 3: generateAxiom3(rank, &newLines)
+            case 4: generateAxiom4(rank, &newLines)
+            case 5: generateAxiom5(rank, &newLines)
+            case 6: generateAxiom6(rank, &newLines)
+            case 7: generateAxiom7(rank, &newLines)
             default: break
             }
         }
@@ -52,75 +54,85 @@ func makeAllPointsAndLines() {
         main.allPoints.append(newPoints)
         numPoints += newPoints.count
         numLines  += newLines.count
+        main.numPoints += numPoints
+        main.numLines  += numLines
         print("Rank \(rank): \(numPoints) points, \(numLines) lines")
     }
 }
 
-func generateAxiom1(rank: Int) -> Set<LineReference> {
-    var newLines = Set<LineReference>()
+func generateAxiom1(rank: Int, inout _ newLines: Set<LineReference>) {
     for i in 0...(rank - 1)/2 {
         let j = rank - 1 - i
         for point1 in main.allPoints[i] {
         for point2 in main.allPoints[j] {
+            if newLines.count + main.numLines > main.maxNumLines {
+                return
+            }
             if let newLine = axiom1(point1.point, point2.point) {
                 insert(
-                    uniqueLine: LineReference(newLine, .A1(point1, point2)),
+                    uniqueLine:
+                        LineReference(newLine, .A1(point1, point2), rank),
                     into: &newLines,
                     forRank: rank
                 )
             }
         }}
     }
-    return newLines
 }
 
-func generateAxiom2(rank: Int) -> Set<LineReference> {
-    var newLines = Set<LineReference>()
+func generateAxiom2(rank: Int, inout _ newLines: Set<LineReference>) {
     for i in 0...(rank - 1)/2 {
         let j = rank - 1 - i
         for point1 in main.allPoints[i] {
         for point2 in main.allPoints[j] {
+            if newLines.count + main.numLines > main.maxNumLines {
+                return
+            }
             if let newLine = axiom2(point1.point, point2.point) {
                 insert(
-                    uniqueLine: LineReference(newLine, .A2(point1, point2)),
+                    uniqueLine:
+                        LineReference(newLine, .A2(point1, point2), rank),
                     into: &newLines,
                     forRank: rank
                 )
             }
         }}
     }
-    return newLines
 }
 
-func generateAxiom3(rank: Int) -> Set<LineReference> {
-    var newLines = Set<LineReference>()
+func generateAxiom3(rank: Int, inout _ newLines: Set<LineReference>) {
     for i in 0...(rank - 1)/2 {
         let j = rank - 1 - i
         for line1 in main.allLines[i] {
         for line2 in main.allLines[j] {
             for newLine in axiom3(line1.line, line2.line) {
+                if newLines.count + main.numLines > main.maxNumLines {
+                    return
+                }
                 insert(
-                    uniqueLine: LineReference(newLine, .A3(line1, line2)),
+                    uniqueLine: LineReference(newLine, .A3(line1, line2), rank),
                     into: &newLines,
                     forRank: rank
                 )
             }
         }}
     }
-    return newLines
 }
 
-func generateAxiom4(rank: Int) -> Set<LineReference> {
-    var newLines = Set<LineReference>()
+func generateAxiom4(rank: Int, inout _ newLines: Set<LineReference>) {
     for i in 0...(rank - 1)/2 {
         let j = rank - 1 - i
         for line  in main.allLines[i]  {
         for point in main.allPoints[j] {
             if !line.line.contains(point.point) {
+                if newLines.count + main.numLines > main.maxNumLines {
+                    return
+                }
                 if let newLine =
                         axiom4(point: point.point, line: line.line) {
                     insert(
-                        uniqueLine: LineReference(newLine, .A4(point, line)),
+                        uniqueLine:
+                            LineReference(newLine, .A4(point, line), rank),
                         into: &newLines,
                         forRank: rank
                     )
@@ -128,11 +140,9 @@ func generateAxiom4(rank: Int) -> Set<LineReference> {
             }
         }}
     }
-    return newLines
 }
 
-func generateAxiom5(rank: Int) -> Set<LineReference> {
-    var newLines = Set<LineReference>()
+func generateAxiom5(rank: Int, inout _ newLines: Set<LineReference>) {
     for i in 0...(rank - 1)     {
     for j in 0...(rank - 1 - i) {
         let k = rank - i - j - 1
@@ -145,9 +155,12 @@ func generateAxiom5(rank: Int) -> Set<LineReference> {
             && !line.line.contains(point2.point) {
                 for newLine in axiom5(bring: point1.point, to: line.line,
                                     through: point2.point) {
+                    if newLines.count + main.numLines > main.maxNumLines {
+                        return
+                    }
                     insert(
                         uniqueLine: LineReference(
-                                newLine, .A5(point1, line, point2)),
+                                newLine, .A5(point1, line, point2), rank),
                         into: &newLines,
                         forRank: rank
                     )
@@ -155,11 +168,9 @@ func generateAxiom5(rank: Int) -> Set<LineReference> {
             }
         }}}
     }}
-    return newLines
 }
 
-func generateAxiom6(rank: Int) -> Set<LineReference> {
-    var newLines = Set<LineReference>()
+func generateAxiom6(rank: Int, inout _ newLines: Set<LineReference>) {
     for sumP in 0...(rank - 1)        {   // Sum of ranks of the two points
     for sumL in 0...(rank - 1 - sumP) {   // Sum of ranks of the two lines
     for i    in 0...(sumP/2)          {
@@ -179,9 +190,13 @@ func generateAxiom6(rank: Int) -> Set<LineReference> {
                     for newLine in axiom6(
                             bring: point1.point, to: line1.line,
                             and: point2.point, on: line2.line) {
+                        if newLines.count + main.numLines
+                        > main.maxNumLines {
+                            return
+                        }
                         insert(
-                            uniqueLine: LineReference(
-                                    newLine, .A6(point1, line1, point2, line2)),
+                            uniqueLine: LineReference(newLine,
+                                    .A6(point1, line1, point2, line2), rank),
                             into: &newLines,
                             forRank: rank
                         )
@@ -190,11 +205,9 @@ func generateAxiom6(rank: Int) -> Set<LineReference> {
             }}}}
         }}
     }}}
-    return newLines
 }
 
-func generateAxiom7(rank: Int) -> Set<LineReference> {
-    var newLines = Set<LineReference>()
+func generateAxiom7(rank: Int, inout _ newLines: Set<LineReference>) {
     for i in 0...(rank - 1)     {
     for j in 0...(rank - 1 - i) {
         let k = rank - 1 - i - j
@@ -203,11 +216,14 @@ func generateAxiom7(rank: Int) -> Set<LineReference> {
         for line2 in main.allLines[k]  {
             if i != k
             && !line1.line.contains(point.point) {
+                if newLines.count + main.numLines > main.maxNumLines {
+                    return
+                }
                 if let newLine = axiom7(bring: point.point, to: line1.line,
                                         along: line2.line) {
                     insert(
                         uniqueLine: LineReference(
-                                newLine, .A7(point, line1, line2)),
+                                newLine, .A7(point, line1, line2), rank),
                         into: &newLines,
                         forRank: rank
                     )
@@ -215,7 +231,6 @@ func generateAxiom7(rank: Int) -> Set<LineReference> {
             }
         }}}
     }}
-    return newLines
 }
 
 // Find the intersections lines between the lines in `lines1` and `lines2`
@@ -228,7 +243,7 @@ func getIntersections(lines1: Set<LineReference>,
         if let point = intersection(angleConstraint: main.minAngle,
                 line1.line, line2.line) where main.paper.encloses(point) {
             insert(
-                uniquePoint: PointReference(line1, line2, point),
+                uniquePoint: PointReference(line1, line2, point, rank),
                 into: &points,
                 forRank: rank
             )
@@ -450,7 +465,7 @@ func printInstructions(line line: LineReference,
         }
         line.label = "line \(lineLabels.popLast()!)(\(line.line))"
         print("(A7) Fold \(point1.label) onto \(line1.label)"
-            + " perpendicular to \(line2.label), creating line \(line.label)")
+            + " perpendicular to \(line2.label), creating \(line.label)")
     }
     return (pointLabels, lineLabels)
 }

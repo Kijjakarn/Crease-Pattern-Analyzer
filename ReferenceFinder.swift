@@ -2,7 +2,7 @@ class ReferenceFinder {
     var ε = 1e-8
     var εF: Float = 1e-8
 
-    var maxRank = 4
+    var maxRank = 5
     var axioms  = 1...7
     var paper   = Rectangle(bottomLeft: PointVector(0, 0),
                               topRight: PointVector(1, 1))
@@ -24,6 +24,18 @@ class ReferenceFinder {
 
     // Minimum angle in degree between lines to define an intersection
     var minAngle  = 20.0
+
+    // Number of points generated so far
+    var numPoints = 0
+
+    // Number of lines generated so far
+    var numLines = 0
+
+    // Maximum number of points to generate
+    var maxNumPoints = 50000
+
+    // Maximum number of lines to generate
+    var maxNumLines = 50000
 
     // Maximum number of matches to display
     var maxNumMatches = 15
