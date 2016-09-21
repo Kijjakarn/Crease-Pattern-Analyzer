@@ -480,7 +480,7 @@ func getPairs<T>(data: Set<T>, ordered: Bool) -> [(T, T)] {
         var indexNew = index.successor()
         while indexNew != data.endIndex {
             pairs.append((data[index], data[indexNew]))
-            if (ordered) { pairs.append((data[indexNew], data[index])) }
+            if ordered { pairs.append((data[indexNew], data[index])) }
             indexNew = indexNew.successor()
         }
         index = index.successor()

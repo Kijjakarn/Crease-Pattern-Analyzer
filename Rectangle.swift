@@ -57,34 +57,34 @@ struct Rectangle {
         rightLine  = Line(distance: topRight.x,   unitNormal: PointVector(1, 0))
         topLine    = Line(distance: topRight.y,   unitNormal: PointVector(0, 1))
 
-        leftReference   = LineReference(leftLine,   label: "left edge")
-        bottomReference = LineReference(bottomLine, label: "bottom edge")
-        rightReference  = LineReference(rightLine,  label: "right edge")
-        topReference    = LineReference(topLine,    label: "top edge")
+        leftReference   = LineReference(leftLine,   label: "the left edge")
+        bottomReference = LineReference(bottomLine, label: "the bottom edge")
+        rightReference  = LineReference(rightLine,  label: "the right edge")
+        topReference    = LineReference(topLine,    label: "the top edge")
 
         bottomLeftReference = PointReference(
             leftReference,
             bottomReference,
             PointVector(bottomLeft.x, bottomLeft.y),
-            label: "bottom left corner"
+            label: "the bottom left corner"
         )
         topLeftReference = PointReference(
             leftReference,
             topReference,
             PointVector(bottomLeft.x, topRight.y),
-            label: "top left corner"
+            label: "the top left corner"
         )
         topRightReference = PointReference(
             rightReference,
             topReference,
             PointVector(topRight.x, topRight.y),
-            label: "top right corner"
+            label: "the top right corner"
         )
         bottomRightReference = PointReference(
             rightReference,
             bottomReference,
             PointVector(topRight.x, bottomLeft.y),
-            label: "bottom right corner"
+            label: "the bottom right corner"
         )
     }
 
