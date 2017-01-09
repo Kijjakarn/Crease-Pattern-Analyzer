@@ -1,3 +1,10 @@
+//
+//  PointVector.swift
+//  CreasePatternAnalyzer
+//
+//  Copyright © 2016-2017 Kijjakarn Praditukrit. All rights reserved.
+//
+
 import Darwin
 
 struct PointVector: Hashable, CustomStringConvertible {

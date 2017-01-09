@@ -1,3 +1,10 @@
+//
+//  Line.swift
+//  CreasePatternAnalyzer
+//
+//  Copyright © 2016-2017 Kijjakarn Praditukrit. All rights reserved.
+//
+
 import Darwin
 
 struct Line: Hashable, CustomStringConvertible {
@@ -88,11 +95,11 @@ struct Line: Hashable, CustomStringConvertible {
         }
     }
 
-    func yFrom(x: Double) -> Double {
+    func y(fromX x: Double) -> Double {
         return (distance - x*unitNormal.x)/unitNormal.y
     }
 
-    func xFrom(y: Double) -> Double {
+    func x(fromY y: Double) -> Double {
         return (distance - y*unitNormal.y)/unitNormal.x
     }
 
@@ -109,7 +116,11 @@ struct Line: Hashable, CustomStringConvertible {
     }
 
     func contains(point: PointVector) -> Bool {
-        return abs(distance - point.dot(unitNormal)) < main.ε
+        return distance(toPoint: point) < main.ε
+    }
+
+    func distance(toPoint point: PointVector) -> Double {
+        return abs(distance - point.dot(unitNormal))
     }
 }
 
@@ -136,9 +147,6 @@ func angle(_ first: Line, _ second: Line) -> Double {
 // Return nil if lines are parallel or are the same
 func intersection(_ first: Line, _ second: Line) -> PointVector? {
     if first.isParallel(toLine: second) {
-        return nil
-    }
-    if angle(first, second) < main.minAngle {
         return nil
     }
     let denominator = first.unitNormal.x*second.unitNormal.y

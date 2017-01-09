@@ -1,3 +1,11 @@
+//
+//  Axioms.swift
+//  CreasePatternAnalyzer
+//
+//  Created by Kijjakarn Praditukrit on 11/22/16.
+//  Copyright © 2016-2017 Kijjakarn Praditukrit. All rights reserved.
+//
+
 import Darwin
 
 /*----------------------------------------------------------------------------
@@ -14,21 +22,20 @@ func axiom1(_ p1: PointVector, _ p2: PointVector) -> Line? {
 // Axiom 2: Given two points p1 and p2, we can fold p1 onto p2
 func axiom2(_ p1: PointVector, _ p2: PointVector) -> Line? {
     let unitNormal = ((p1 - p2)/2).normalized()
-    let midPoint = (p1 + p2)/2
-    let fold = Line(point: midPoint, unitNormal: unitNormal)
+    let midPoint   = (p1 + p2)/2
+    let fold       = Line(point: midPoint, unitNormal: unitNormal)
     return main.paper.contains(line: fold) ? fold : nil
 }
 
 // Axiom 3: Given two lines line1 and line2, we can fold line1 onto line2
 // - If lines are parallel, return one solution
-// - Otherwise, return line(s) contained in the main.paper
-func axiom3(_ line1: Line, _ line2: Line) -> [Line] {
+// - Otherwise, return line(s) contained in main.paper
+func axiom3(_ line1: Line, _ line2: Line, _ cond: Bool = false) -> [Line] {
     guard let p = intersection(line1, line2) else {
         return [Line(distance: (line1.distance + line2.distance)/2,
-                     unitNormal: line1.unitNormal)]
+                   unitNormal: line1.unitNormal)]
     }
-    let direction = ((line1.unitNormal
-                  + line2.unitNormal)/2).normalized()
+    let direction = ((line1.unitNormal + line2.unitNormal)/2).normalized()
     let fold1 = Line(point: p, unitNormal: direction)
     let fold2 = Line(point: p, unitNormal: direction.rotatedBy90())
     var folds = [Line]()
@@ -56,22 +63,15 @@ func axiom5(bring p1: PointVector, to line: Line, through p2: PointVector)
     let radius = (p1 - p2).magnitude
     let centerToLine = line.unitNormal*(line.distance - line.unitNormal.dot(p2))
 
-    print("radius: \(radius), centerToLine: \(centerToLine)")
-
     // If the line does not intersect the circle
     if radius < centerToLine.magnitude {
         return []
     }
-    // If the line is tangent to the circle
-    /* if abs(radius - centerToLine.magnitude) < main.ε {
-        print("line is tangent")
-        return [Line(point: p2, unitNormal: line.unitNormal)]
-    } */
     let addVector = line.unitNormal.rotatedBy90()
                   * sqrt(radius*radius - centerToLine.magnitudeSquared())
     let point1 = centerToLine + p2 + addVector
     let point2 = centerToLine + p2 - addVector
-    var folds = [Line]()
+    var folds  = [Line]()
     if main.paper.encloses(point: point1) {
         let p11 = (p1 + point1)/2
         if p2 != p11 {
@@ -121,17 +121,23 @@ func axiom6(bring p1: PointVector, to line1: Line,
         let p1Folded = u1*line1.distance + u1P*(root + x1)
 
         // If fold goes through p1 or main.paper doesn't enclose reflected point
-        if p1 == p1Folded || !main.paper.encloses(point: p1Folded) { continue }
+        if p1 == p1Folded || !main.paper.encloses(point: p1Folded) {
+            continue
+        }
         let fold = Line(point: (p1 + p1Folded)/2, normal: (p1 - p1Folded))
 
-        // If main.paper doesn't contain the fold or p1 and p2 aren't on the same
-        // side of the main.paper
-        if !main.paper.contains(line: fold) || (line1.distance - p1.dot(u1))
-           * (line1.distance - p1.dot(u2)) < 0 { continue }
+        // If main.paper doesn't contain the fold or p1 and p2 aren't on the
+        // same side of main.paper
+        if !main.paper.contains(line: fold)
+        || (line1.distance - p1.dot(u1))*(line1.distance - p1.dot(u2)) < 0 {
+           continue
+        }
         let p2Folded = fold.reflection(ofPoint: p2)
 
         // If fold doesn't enclose the reflected p2
-        if !main.paper.encloses(point: p2Folded) { continue }
+        if !main.paper.encloses(point: p2Folded) {
+            continue
+        }
         folds.append(fold)
     }
     return folds
@@ -157,9 +163,9 @@ func solveCubic(_ a: Double , _ b: Double, _ c: Double, _ d: Double) -> [Double]
         let discriminant = c*c - 4*b*d
         if discriminant < 0   { return [] }
         if discriminant < main.ε { return [-c/(2*b)] }
-        let sqrtDiscriminant = sqrt(discriminant)
-        let x1 = (-c + sqrtDiscriminant)/(2*b)
-        let x2 = (-c - sqrtDiscriminant)/(2*b)
+        let sqrtOfDiscriminant = sqrt(discriminant)
+        let x1 = (-c + sqrtOfDiscriminant)/(2*b)
+        let x2 = (-c - sqrtOfDiscriminant)/(2*b)
         return [x1, x2]
     }
     // The equation is cubic
@@ -169,9 +175,9 @@ func solveCubic(_ a: Double , _ b: Double, _ c: Double, _ d: Double) -> [Double]
 
     // All roots are real and distinct
     if discriminant < 0 {
-        let θ = acos(r/sqrt(-q^^3))/3
-        let e = 2*sqrt(-q)
-        let f = b/(3*a)
+        let θ  = acos(r/sqrt(-q^^3))/3
+        let e  = 2*sqrt(-q)
+        let f  = b/(3*a)
         let x1 = e*cos(θ) - f
         let x2 = e*cos(θ + 2*π/3) - f
         let x3 = e*cos(θ + 4*π/3) - f
@@ -181,8 +187,8 @@ func solveCubic(_ a: Double , _ b: Double, _ c: Double, _ d: Double) -> [Double]
     if discriminant < main.ε {
         // There is only one real root
         if r == 0 { return [-b/(3*a)] }
-        let e = cbrt(r)
-        let f = b/(3*a)
+        let e  = cbrt(r)
+        let f  = b/(3*a)
         let x1 = 2*e - f
         let x2 = -e - f
         return [x1, x2]

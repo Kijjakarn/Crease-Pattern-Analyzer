@@ -1,13 +1,19 @@
 import Darwin
 
 /*----------------------------------------------------------------------------
-                Utility Functions Called from the Main Program
+                Utility Functions Called from MainWindowController
 -----------------------------------------------------------------------------*/
 
 let π = M_PI
 
+precedencegroup ExponentiationPrecedence {
+    higherThan: MultiplicationPrecedence
+    associativity: right
+    assignment: false
+}
+
 // Infix operator for raising a number to some power
-infix operator^^ { associativity left precedence 180 }
+infix operator ^^ : ExponentiationPrecedence
 func ^^(base: Double, exponent: Double) -> Double {
     return pow(base, exponent)
 }
@@ -46,7 +52,7 @@ func makeAllPointsAndLines() {
         // Make intersection points from the new lines
         for i in 0...(rank/2) {
             let j = rank - i
-            newPoints.unionInPlace(getIntersections(
+            newPoints.formUnion(getIntersections(
                     main.allLines[i], main.allLines[j], forRank: rank
                 )
             )
@@ -60,7 +66,7 @@ func makeAllPointsAndLines() {
     }
 }
 
-func generateAxiom1(rank: Int, inout _ newLines: Set<LineReference>) {
+func generateAxiom1(_ rank: Int, _ newLines: inout Set<LineReference>) {
     for i in 0...(rank - 1)/2 {
         let j = rank - 1 - i
         for point1 in main.allPoints[i] {
@@ -80,7 +86,7 @@ func generateAxiom1(rank: Int, inout _ newLines: Set<LineReference>) {
     }
 }
 
-func generateAxiom2(rank: Int, inout _ newLines: Set<LineReference>) {
+func generateAxiom2(_ rank: Int, _ newLines: inout Set<LineReference>) {
     for i in 0...(rank - 1)/2 {
         let j = rank - 1 - i
         for point1 in main.allPoints[i] {
@@ -100,7 +106,7 @@ func generateAxiom2(rank: Int, inout _ newLines: Set<LineReference>) {
     }
 }
 
-func generateAxiom3(rank: Int, inout _ newLines: Set<LineReference>) {
+func generateAxiom3(_ rank: Int, _ newLines: inout Set<LineReference>) {
     for i in 0...(rank - 1)/2 {
         let j = rank - 1 - i
         for line1 in main.allLines[i] {
@@ -119,12 +125,12 @@ func generateAxiom3(rank: Int, inout _ newLines: Set<LineReference>) {
     }
 }
 
-func generateAxiom4(rank: Int, inout _ newLines: Set<LineReference>) {
+func generateAxiom4(_ rank: Int, _ newLines: inout Set<LineReference>) {
     for i in 0...(rank - 1)/2 {
         let j = rank - 1 - i
         for line  in main.allLines[i]  {
         for point in main.allPoints[j] {
-            if !line.line.contains(point.point) {
+            if !line.line.contains(point: point.point) {
                 if newLines.count + main.numLines > main.maxNumLines {
                     return
                 }
@@ -142,7 +148,7 @@ func generateAxiom4(rank: Int, inout _ newLines: Set<LineReference>) {
     }
 }
 
-func generateAxiom5(rank: Int, inout _ newLines: Set<LineReference>) {
+func generateAxiom5(_ rank: Int, _ newLines: inout Set<LineReference>) {
     for i in 0...(rank - 1)     {
     for j in 0...(rank - 1 - i) {
         let k = rank - i - j - 1
@@ -151,8 +157,8 @@ func generateAxiom5(rank: Int, inout _ newLines: Set<LineReference>) {
         for point2 in main.allPoints[k] {
             if i != k
             && point1 != point2
-            && !line.line.contains(point1.point)
-            && !line.line.contains(point2.point) {
+            && !line.line.contains(point: point1.point)
+            && !line.line.contains(point: point2.point) {
                 for newLine in axiom5(bring: point1.point, to: line.line,
                                     through: point2.point) {
                     if newLines.count + main.numLines > main.maxNumLines {
@@ -170,7 +176,7 @@ func generateAxiom5(rank: Int, inout _ newLines: Set<LineReference>) {
     }}
 }
 
-func generateAxiom6(rank: Int, inout _ newLines: Set<LineReference>) {
+func generateAxiom6(_ rank: Int, _ newLines: inout Set<LineReference>) {
     for sumP in 0...(rank - 1)        {   // Sum of ranks of the two points
     for sumL in 0...(rank - 1 - sumP) {   // Sum of ranks of the two lines
     for i    in 0...(sumP/2)          {
@@ -183,10 +189,10 @@ func generateAxiom6(rank: Int, inout _ newLines: Set<LineReference>) {
             for line2  in main.allLines[l]  {
                 if point1 != point2
                 && line1  != line2
-                && !line1.line.contains(point1.point)
-                && !line2.line.contains(point2.point)
-                && !(line1.line.contains(point2.point)
-                  && line2.line.contains(point1.point)) {
+                && !line1.line.contains(point: point1.point)
+                && !line2.line.contains(point: point2.point)
+                && !(line1.line.contains(point: point2.point)
+                  && line2.line.contains(point: point1.point)) {
                     for newLine in axiom6(
                             bring: point1.point, to: line1.line,
                             and: point2.point, on: line2.line) {
@@ -207,7 +213,7 @@ func generateAxiom6(rank: Int, inout _ newLines: Set<LineReference>) {
     }}}
 }
 
-func generateAxiom7(rank: Int, inout _ newLines: Set<LineReference>) {
+func generateAxiom7(_ rank: Int, _ newLines: inout Set<LineReference>) {
     for i in 0...(rank - 1)     {
     for j in 0...(rank - 1 - i) {
         let k = rank - 1 - i - j
@@ -215,7 +221,7 @@ func generateAxiom7(rank: Int, inout _ newLines: Set<LineReference>) {
         for point in main.allPoints[j] {
         for line2 in main.allLines[k]  {
             if i != k
-            && !line1.line.contains(point.point) {
+            && !line1.line.contains(point: point.point) {
                 if newLines.count + main.numLines > main.maxNumLines {
                     return
                 }
@@ -234,14 +240,14 @@ func generateAxiom7(rank: Int, inout _ newLines: Set<LineReference>) {
 }
 
 // Find the intersections lines between the lines in `lines1` and `lines2`
-func getIntersections(lines1: Set<LineReference>,
-                    _ lines2: Set<LineReference>,
+func getIntersections(_ lines1: Set<LineReference>,
+                      _ lines2: Set<LineReference>,
                 forRank rank: Int) -> Set<PointReference> {
     var points = Set<PointReference>()
     for line1 in lines1 {
     for line2 in lines2 {
         if let point = intersection(angleConstraint: main.minAngle,
-                line1.line, line2.line) where main.paper.encloses(point) {
+                line1.line, line2.line), main.paper.encloses(point: point) {
             insert(
                 uniquePoint: PointReference(line1, line2, point, rank),
                 into: &points,
@@ -253,7 +259,7 @@ func getIntersections(lines1: Set<LineReference>,
 }
 
 func insert(uniqueLine line: LineReference,
-        inout into lines: Set<LineReference>, forRank rank: Int) {
+        into lines: inout Set<LineReference>, forRank rank: Int) {
     for i in 0...(rank - 1) {
         if main.allLines[i].contains(line) { return }
     }
@@ -261,7 +267,7 @@ func insert(uniqueLine line: LineReference,
 }
 
 func insert(uniquePoint point: PointReference,
-        inout into points: Set<PointReference>, forRank rank: Int) {
+        into points: inout Set<PointReference>, forRank rank: Int) {
     for i in 0...(rank - 1) {
         if main.allPoints[i].contains(point) || point.hashValue == 0 { return }
     }
@@ -309,9 +315,9 @@ func clearInstructions() {
     }
 }
 
-func printInstructions(point point: PointReference,
-                       pointLabels: [Character] = main.pointLabels,
-                        lineLabels: [Character] = main.lineLabels)
+func printInstructions(point: PointReference,
+                 pointLabels: [Character] = main.pointLabels,
+                  lineLabels: [Character] = main.lineLabels)
         -> (pointLabels: [Character], lineLabels: [Character]) {
     if point.label != "_" {
         return (pointLabels, lineLabels)
@@ -336,9 +342,9 @@ func printInstructions(point point: PointReference,
     return (pointLabels, lineLabels)
 }
 
-func printInstructions(line line: LineReference,
-                     pointLabels: [Character] = main.pointLabels,
-                      lineLabels: [Character] = main.lineLabels)
+func printInstructions(line: LineReference,
+                pointLabels: [Character] = main.pointLabels,
+                 lineLabels: [Character] = main.lineLabels)
         -> (pointLabels: [Character], lineLabels: [Character]) {
     var pointLabels = pointLabels
     var lineLabels  = lineLabels
@@ -477,13 +483,13 @@ func getPairs<T>(data: Set<T>, ordered: Bool) -> [(T, T)] {
     var pairs = [(T, T)]()
     var index = data.startIndex
     while index != data.endIndex {
-        var indexNew = index.successor()
+        var indexNew = data.index(after: index)
         while indexNew != data.endIndex {
             pairs.append((data[index], data[indexNew]))
             if ordered { pairs.append((data[indexNew], data[index])) }
-            indexNew = indexNew.successor()
+            indexNew = data.index(after: indexNew)
         }
-        index = index.successor()
+        index = data.index(after: index)
     }
     return pairs
 }

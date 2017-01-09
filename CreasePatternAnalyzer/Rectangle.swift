@@ -1,3 +1,10 @@
+//
+//  Rectangle.swift
+//  CreasePatternAnalyzer
+//
+//  Copyright © 2016-2017 Kijjakarn Praditukrit. All rights reserved.
+//
+
 struct Rectangle {
     var bottomLeft: PointVector
     var topRight: PointVector
@@ -88,10 +95,25 @@ struct Rectangle {
         )
     }
 
+    init(width: Double, height: Double) {
+        self.init(bottomLeft: PointVector(0, 0),
+                    topRight: PointVector(width, height))
+    }
+
     // True if point is contained in the ractangle
     func encloses(point: PointVector) -> Bool {
-        return bottomLeft.x <= point.x && point.x <= topRight.x
-            && bottomLeft.y <= point.y && point.y <= topRight.y
+        return bottomLeft.x - main.ε <= point.x
+            && point.x <= topRight.x + main.ε
+            && bottomLeft.y - main.ε <= point.y
+            && point.y <= topRight.y + main.ε
+    }
+
+    func encloses(x: Double) -> Bool {
+        return bottomLeft.x <= x && x <= topRight.x
+    }
+
+    func encloses(y: Double) -> Bool {
+        return bottomLeft.y <= y && y <= topRight.y
     }
 
     // Stretch the coordinates so that the rectangle encloses the point

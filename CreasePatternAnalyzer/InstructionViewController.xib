@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+        <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="InstructionViewController" customModule="CreasePatternAnalyzer" customModuleProvider="target">
+            <connections>
+                <outlet property="diagramView" destination="G3B-v3-bP4" id="HRg-OA-Bkn"/>
+                <outlet property="instruction" destination="wm9-K2-OBS" id="FJL-bs-5f8"/>
+                <outlet property="nextButton" destination="hmo-YC-qNG" id="jyE-8b-IYV"/>
+                <outlet property="previousButton" destination="C0i-y5-VDF" id="lTD-UB-pPg"/>
+                <outlet property="view" destination="Lty-xK-oMU" id="aIH-pP-8bH"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Lty-xK-oMU">
+            <rect key="frame" x="0.0" y="0.0" width="304" height="601"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="250" verticalStackHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bdl-VJ-SF6">
+                    <rect key="frame" x="20" y="20" width="264" height="561"/>
+                    <subviews>
+                        <customView verticalCompressionResistancePriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="G3B-v3-bP4" customClass="DiagramView" customModule="CreasePatternAnalyzer" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="87" width="264" height="474"/>
+                        </customView>
+                        <customView verticalHuggingPriority="1000" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="KaZ-11-inB">
+                            <rect key="frame" x="0.0" y="58" width="264" height="21"/>
+                            <subviews>
+                                <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C0i-y5-VDF">
+                                    <rect key="frame" x="-5" y="-7" width="93" height="32"/>
+                                    <buttonCell key="cell" type="push" title="Previous" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Jwf-70-dev">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="showPrevious:" target="-2" id="IHO-Jx-uct"/>
+                                        <binding destination="-2" name="enabled2" keyPath="self.delegate.hasFinishedInitialization" previousBinding="YTI-r8-dSm" id="7QW-SC-n6Y">
+                                            <dictionary key="options">
+                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                <integer key="NSNullPlaceholder" value="-1"/>
+                                            </dictionary>
+                                        </binding>
+                                        <binding destination="-2" name="enabled" keyPath="self.enablePreviousButton" id="YTI-r8-dSm"/>
+                                    </connections>
+                                </button>
+                                <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hmo-YC-qNG">
+                                    <rect key="frame" x="84" y="-7" width="69" height="32"/>
+                                    <buttonCell key="cell" type="push" title="Next" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cfB-dH-eKQ">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="showNext:" target="-2" id="YQQ-4e-ErH"/>
+                                        <binding destination="-2" name="enabled2" keyPath="self.delegate.hasFinishedInitialization" previousBinding="snj-h4-OHQ" id="5t1-YN-DPb">
+                                            <dictionary key="options">
+                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                <integer key="NSNullPlaceholder" value="-1"/>
+                                            </dictionary>
+                                        </binding>
+                                        <binding destination="-2" name="enabled" keyPath="self.enableNextButton" id="snj-h4-OHQ"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="hmo-YC-qNG" firstAttribute="leading" secondItem="C0i-y5-VDF" secondAttribute="trailing" constant="8" id="JbI-fO-thA"/>
+                                <constraint firstAttribute="bottom" secondItem="hmo-YC-qNG" secondAttribute="bottom" id="N5T-UH-YgA"/>
+                                <constraint firstItem="hmo-YC-qNG" firstAttribute="top" secondItem="KaZ-11-inB" secondAttribute="top" id="Vep-oE-0i3"/>
+                                <constraint firstAttribute="bottom" secondItem="C0i-y5-VDF" secondAttribute="bottom" id="Xg5-Gf-QxS"/>
+                                <constraint firstItem="C0i-y5-VDF" firstAttribute="top" secondItem="KaZ-11-inB" secondAttribute="top" id="YPW-fh-OAJ"/>
+                                <constraint firstItem="C0i-y5-VDF" firstAttribute="leading" secondItem="KaZ-11-inB" secondAttribute="leading" id="yaY-q4-kBB"/>
+                            </constraints>
+                        </customView>
+                        <textField horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="wm9-K2-OBS">
+                            <rect key="frame" x="0.0" y="0.0" width="264" height="50"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="50" id="Wto-Yn-nwq"/>
+                            </constraints>
+                            <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" drawsBackground="YES" id="AmN-sd-N2s">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="KaZ-11-inB" firstAttribute="top" secondItem="G3B-v3-bP4" secondAttribute="bottom" constant="8" id="3Lz-Mw-1fd"/>
+                        <constraint firstAttribute="trailing" secondItem="KaZ-11-inB" secondAttribute="trailing" id="3wA-5F-rlb"/>
+                        <constraint firstAttribute="trailing" secondItem="G3B-v3-bP4" secondAttribute="trailing" id="4sF-ro-uWr"/>
+                        <constraint firstItem="G3B-v3-bP4" firstAttribute="leading" secondItem="bdl-VJ-SF6" secondAttribute="leading" id="CHn-cb-QnZ"/>
+                        <constraint firstAttribute="trailing" secondItem="wm9-K2-OBS" secondAttribute="trailing" id="NY7-Wb-3e0"/>
+                        <constraint firstItem="wm9-K2-OBS" firstAttribute="leading" secondItem="bdl-VJ-SF6" secondAttribute="leading" id="Zqx-YV-vd9"/>
+                        <constraint firstItem="KaZ-11-inB" firstAttribute="leading" secondItem="bdl-VJ-SF6" secondAttribute="leading" id="c22-Tg-WJO"/>
+                        <constraint firstItem="wm9-K2-OBS" firstAttribute="top" secondItem="KaZ-11-inB" secondAttribute="bottom" constant="8" id="ftQ-3E-ZU5"/>
+                        <constraint firstAttribute="bottom" secondItem="wm9-K2-OBS" secondAttribute="bottom" id="sM3-jg-lcv"/>
+                        <constraint firstItem="G3B-v3-bP4" firstAttribute="top" secondItem="bdl-VJ-SF6" secondAttribute="top" id="wIa-NR-oiG"/>
+                    </constraints>
+                    <visibilityPriorities>
+                        <real value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="bdl-VJ-SF6" firstAttribute="top" secondItem="Lty-xK-oMU" secondAttribute="top" constant="20" id="9hx-CZ-FsO"/>
+                <constraint firstItem="bdl-VJ-SF6" firstAttribute="leading" secondItem="Lty-xK-oMU" secondAttribute="leading" constant="20" id="Hy3-2Q-okF"/>
+                <constraint firstAttribute="bottom" secondItem="bdl-VJ-SF6" secondAttribute="bottom" constant="20" id="jZb-Sr-SMq"/>
+                <constraint firstAttribute="trailing" secondItem="bdl-VJ-SF6" secondAttribute="trailing" constant="20" id="lRz-1f-Tq4"/>
+            </constraints>
+            <point key="canvasLocation" x="135" y="453.5"/>
+        </customView>
+        <userDefaultsController representsSharedInstance="YES" id="sRk-7W-wTJ"/>
+    </objects>
+</document>

@@ -1,3 +1,10 @@
+//
+//  Parser.swift
+//  CreasePatternAnalyzer
+//
+//  Copyright © 2016-2017 Kijjakarn Praditukrit. All rights reserved.
+//
+
 import Darwin
 
 // String passed into this function must start with "." or a digit
@@ -189,7 +196,7 @@ class Parser {
             return (false, "Stack failure", 0)
         }
         catch ParseError.EmptyExpression {
-            return (false, "Cannot parse empty expression", 0)
+            return (false, "", 0)
         }
         catch {
             return (false, "Unknown error", 0)
