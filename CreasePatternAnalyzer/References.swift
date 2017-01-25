@@ -11,6 +11,37 @@ protocol Reference {
     var label: String { get set }
 }
 
+class HashableReference: Hashable {
+    var wrapped: Reference
+    let hashValueClosure: () -> Int
+    let equalsClosure: (Any) -> Bool
+
+    var hashValue: Int {
+        return hashValueClosure()
+    }
+
+    init<T>(with: T) where T: Reference, T: Hashable {
+        wrapped = with
+        hashValueClosure = {
+            return with.hashValue
+        }
+        equalsClosure = {
+            if let other = $0 as? T {
+                return other == with
+            }
+            return false
+        }
+    }
+}
+
+func ==(left: HashableReference, right: HashableReference) -> Bool {
+    return left.equalsClosure(right.wrapped)
+}
+
+func ==(left: HashableReference, right: Reference) -> Bool {
+    return left.equalsClosure(right)
+}
+
 // A reference to a point obtained from an intersection of two lines
 class PointReference: NSObject, Reference {
     let point:      PointVector!
