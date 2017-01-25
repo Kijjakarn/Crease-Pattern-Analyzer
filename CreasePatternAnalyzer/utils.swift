@@ -377,7 +377,7 @@ func matchedLines(for inputLine: Line) -> [LineReference] {
 
 func clearInstructions() {
     for var reference in main.referenced {
-        reference.label = "_"
+        reference.wrapped.label = "_"
     }
     main.referenced.removeAll()
     main.instructions.removeAll()
@@ -392,7 +392,14 @@ func makeInstructions(for reference: Reference) {
     while !stack.isEmpty {
         let (reference, ready) = stack.popLast()!
         if ready {
-            main.referenced.append(reference)
+            if reference is PointReference {
+                main.referenced.insert(HashableReference(
+                    with: reference as! PointReference))
+            }
+            else {
+                main.referenced.insert(HashableReference(
+                    with: reference as! LineReference))
+            }
         }
         if let point = reference as? PointReference {
             let line1 = point.firstLine!
