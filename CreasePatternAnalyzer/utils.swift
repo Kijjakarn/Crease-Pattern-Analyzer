@@ -46,7 +46,8 @@ func makeAllPointsAndLines() {
     main.numPoints = 0
     main.allPoints.removeAll()
     main.allLines.removeAll()
-    main.referenced.removeAll()
+    main.referencedPoints.removeAll()
+    main.referencedLines.removeAll()
     main.diagrams.removeAll()
     main.instructions.removeAll()
 
@@ -376,10 +377,14 @@ func matchedLines(for inputLine: Line) -> [LineReference] {
 }
 
 func clearInstructions() {
-    for var reference in main.referenced {
-        reference.wrapped.label = "_"
+    for referencedPoint in main.referencedPoints {
+        referencedPoint.label = "_"
     }
-    main.referenced.removeAll()
+    for referencedLine in main.referencedLines {
+        referencedLine.label = "_"
+    }
+    main.referencedPoints.removeAll()
+    main.referencedLines.removeAll()
     main.instructions.removeAll()
     main.diagrams.removeAll()
 }
@@ -393,15 +398,17 @@ func makeInstructions(for reference: Reference) {
         let (reference, ready) = stack.popLast()!
         if ready {
             if reference is PointReference {
-                main.referenced.insert(HashableReference(
-                    with: reference as! PointReference))
+                main.referencedPoints.insert(reference as! PointReference)
             }
             else {
-                main.referenced.insert(HashableReference(
-                    with: reference as! LineReference))
+                main.referencedLines.insert(reference as! LineReference)
             }
         }
         if let point = reference as? PointReference {
+            // If already made, ignore
+            if main.referencedPoints.contains(point) && !ready {
+                continue
+            }
             let line1 = point.firstLine!
             let line2 = point.secondLine!
             if !ready {
@@ -443,6 +450,11 @@ func makeInstructions(for reference: Reference) {
         }
         // reference is LineReference
         let line = reference as! LineReference
+
+        // If already made, ignore
+        if main.referencedLines.contains(line) && !ready {
+            continue
+        }
         var instruction: String
         var arrows = [Arrow]()
         var points = [PointReference]()
