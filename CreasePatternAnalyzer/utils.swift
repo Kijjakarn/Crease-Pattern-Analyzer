@@ -439,7 +439,6 @@ func makeInstructions(for reference: Reference) {
             }
             // Delete old fold
             diagram.fold = nil
-
             diagram.lines = [line1, line2]
             diagram.points = [point]
 
@@ -755,7 +754,11 @@ func makeInstructions(for reference: Reference) {
         var diagram: Diagram
         if let oldDiagram = main.diagrams.last {
             diagram = oldDiagram
-            diagram.creases.append(contentsOf: oldDiagram.lines)
+            for oldLine in oldDiagram.lines {
+                if oldLine.isNotEdge() {
+                    diagram.creases.append(oldLine)
+                }
+            }
         }
         else {
             diagram = Diagram()
