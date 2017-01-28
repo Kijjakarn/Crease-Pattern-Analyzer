@@ -25,7 +25,7 @@ like to contribute.
 
 ## License
 
-This work is licensed under the terms of GNU GPLv3. See gpl.txt for more
+This work is licensed under the terms of GNU GPLv3. See LICENSE.txt for more
 information.
 
 [1]: http://www.langorigami.com/article/referencefinder "ReferenceFinder"
