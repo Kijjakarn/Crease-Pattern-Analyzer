@@ -26,6 +26,10 @@ class PointReference: NSObject, Reference {
 
     var label: String = "_"
 
+    func isNotCorner() -> Bool {
+        return label.characters.count == 1
+    }
+
     override var description: String {
         if label.characters.count == 1 {
             return "point \(label)"
@@ -78,6 +82,10 @@ class LineReference: NSObject, Reference {
     var angleError = DBL_MAX
 
     var label: String = "_"
+
+    func isNotEdge() -> Bool {
+        return label.characters.count == 1
+    }
 
     override var hashValue: Int {
         return line.hashValue

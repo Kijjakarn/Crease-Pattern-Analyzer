@@ -24,23 +24,27 @@ class InstructionViewController: NSViewController {
 
     var viewNumber: Int = 0 {
         didSet {
-            if (viewNumber == 0) {
+            if viewNumber == 0 {
                 enablePreviousButton = false
             }
-            else if (viewNumber == main.diagrams.count - 1) {
+            else if viewNumber == main.diagrams.count - 1 {
                 enableNextButton = false
             }
             else {
                 enablePreviousButton = true
                 enableNextButton = true
             }
-            CATransaction.commit()
             if main.diagrams.isEmpty {
+                CATransaction.commit()
                 return
             }
             diagramView.diagram = main.diagrams[viewNumber]
+            if diagramView.diagram.rank == 0 {
+                enableNextButton = false
+            }
+            CATransaction.commit()
             instruction.stringValue = main.instructions[viewNumber]
-            diagramView.needsDisplay = true
+            diagramView.drawAll()
         }
     }
 

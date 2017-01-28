@@ -14,7 +14,7 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         window!.title = "Crease Pattern Analyzer"
-        
+
         let appDelegate = NSApplication.shared().delegate as! AppDelegate
         appDelegate.initializationQueue.addOperation {
             makeAllPointsAndLines()

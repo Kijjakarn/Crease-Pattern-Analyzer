@@ -19,20 +19,20 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Lty-xK-oMU">
-            <rect key="frame" x="0.0" y="0.0" width="304" height="601"/>
+            <rect key="frame" x="0.0" y="0.0" width="600" height="601"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="250" verticalStackHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bdl-VJ-SF6">
-                    <rect key="frame" x="20" y="20" width="264" height="561"/>
+                    <rect key="frame" x="20" y="20" width="560" height="561"/>
                     <subviews>
                         <customView verticalCompressionResistancePriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="G3B-v3-bP4" customClass="DiagramView" customModule="CreasePatternAnalyzer" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="87" width="264" height="474"/>
+                            <rect key="frame" x="0.0" y="87" width="560" height="474"/>
                         </customView>
                         <customView verticalHuggingPriority="1000" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="KaZ-11-inB">
-                            <rect key="frame" x="0.0" y="58" width="264" height="21"/>
+                            <rect key="frame" x="0.0" y="58" width="560" height="21"/>
                             <subviews>
-                                <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C0i-y5-VDF">
-                                    <rect key="frame" x="-5" y="-7" width="93" height="32"/>
+                                <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="C0i-y5-VDF">
+                                    <rect key="frame" x="-6" y="-7" width="93" height="32"/>
                                     <buttonCell key="cell" type="push" title="Previous" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Jwf-70-dev">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -50,8 +50,8 @@
                                         <binding destination="-2" name="enabled" keyPath="self.enablePreviousButton" id="YTI-r8-dSm"/>
                                     </connections>
                                 </button>
-                                <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hmo-YC-qNG">
-                                    <rect key="frame" x="84" y="-7" width="69" height="32"/>
+                                <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hmo-YC-qNG">
+                                    <rect key="frame" x="83" y="-7" width="69" height="32"/>
                                     <buttonCell key="cell" type="push" title="Next" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cfB-dH-eKQ">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -80,7 +80,7 @@
                             </constraints>
                         </customView>
                         <textField horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="wm9-K2-OBS">
-                            <rect key="frame" x="0.0" y="0.0" width="264" height="50"/>
+                            <rect key="frame" x="0.0" y="0.0" width="560" height="50"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="50" id="Wto-Yn-nwq"/>
                             </constraints>
@@ -95,6 +95,7 @@
                         <constraint firstItem="KaZ-11-inB" firstAttribute="top" secondItem="G3B-v3-bP4" secondAttribute="bottom" constant="8" id="3Lz-Mw-1fd"/>
                         <constraint firstAttribute="trailing" secondItem="KaZ-11-inB" secondAttribute="trailing" id="3wA-5F-rlb"/>
                         <constraint firstAttribute="trailing" secondItem="G3B-v3-bP4" secondAttribute="trailing" id="4sF-ro-uWr"/>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="560" id="7j1-N4-0nm"/>
                         <constraint firstItem="G3B-v3-bP4" firstAttribute="leading" secondItem="bdl-VJ-SF6" secondAttribute="leading" id="CHn-cb-QnZ"/>
                         <constraint firstAttribute="trailing" secondItem="wm9-K2-OBS" secondAttribute="trailing" id="NY7-Wb-3e0"/>
                         <constraint firstItem="wm9-K2-OBS" firstAttribute="leading" secondItem="bdl-VJ-SF6" secondAttribute="leading" id="Zqx-YV-vd9"/>

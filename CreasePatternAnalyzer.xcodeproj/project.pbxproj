@@ -25,6 +25,8 @@
 		3A56BC161DE10D030025021E /* PointViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A56BC151DE10D030025021E /* PointViewController.xib */; };
 		3A56BC181DE115DD0025021E /* DiagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC171DE115DD0025021E /* DiagramView.swift */; };
 		3A56BC1A1DE157560025021E /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC191DE157560025021E /* MainSplitViewController.swift */; };
+		3A95FE311E3C10E200C0DEDA /* CGPoint+midpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A95FE301E3C10E200C0DEDA /* CGPoint+midpoint.swift */; };
+		3A95FE331E3C421100C0DEDA /* Array+minIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A95FE321E3C421100C0DEDA /* Array+minIndex.swift */; };
 		3A9E16151DE54604004DA53F /* Diagram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9E16141DE54604004DA53F /* Diagram.swift */; };
 		3A9E16171DE548EE004DA53F /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9E16161DE548EE004DA53F /* Arrow.swift */; };
 		3AB46EB81DE66C4000B4A009 /* InstructionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB46EB61DE66C4000B4A009 /* InstructionViewController.swift */; };
@@ -76,6 +78,8 @@
 		3A56BC151DE10D030025021E /* PointViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PointViewController.xib; sourceTree = "<group>"; };
 		3A56BC171DE115DD0025021E /* DiagramView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiagramView.swift; sourceTree = "<group>"; };
 		3A56BC191DE157560025021E /* MainSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSplitViewController.swift; sourceTree = "<group>"; };
+		3A95FE301E3C10E200C0DEDA /* CGPoint+midpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPoint+midpoint.swift"; sourceTree = "<group>"; };
+		3A95FE321E3C421100C0DEDA /* Array+minIndex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+minIndex.swift"; sourceTree = "<group>"; };
 		3A9E16141DE54604004DA53F /* Diagram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Diagram.swift; sourceTree = "<group>"; };
 		3A9E16161DE548EE004DA53F /* Arrow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
 		3AB46EB61DE66C4000B4A009 /* InstructionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstructionViewController.swift; sourceTree = "<group>"; };
@@ -143,6 +147,7 @@
 				3AB598D61DE242C400CA0E31 /* ConfigurationViewController.xib */,
 				3AB46EB61DE66C4000B4A009 /* InstructionViewController.swift */,
 				3AB46EB71DE66C4000B4A009 /* InstructionViewController.xib */,
+				3A95FE301E3C10E200C0DEDA /* CGPoint+midpoint.swift */,
 				3A56BC171DE115DD0025021E /* DiagramView.swift */,
 				3AB46EBA1DE6E79D00B4A009 /* IsNotZero.swift */,
 				3A3276BB1DE0173E0076B8DC /* Assets.xcassets */,
@@ -157,6 +162,7 @@
 				3A56BC071DE10C410025021E /* References.swift */,
 				3A56BC091DE10C410025021E /* utils.swift */,
 				3A3276C01DE0173E0076B8DC /* Info.plist */,
+				3A95FE321E3C421100C0DEDA /* Array+minIndex.swift */,
 			);
 			path = CreasePatternAnalyzer;
 			sourceTree = "<group>";
@@ -328,11 +334,13 @@
 				3A56BC1A1DE157560025021E /* MainSplitViewController.swift in Sources */,
 				3A56BC0A1DE10C410025021E /* Axioms.swift in Sources */,
 				3A56BC0E1DE10C410025021E /* PointViewController.swift in Sources */,
+				3A95FE331E3C421100C0DEDA /* Array+minIndex.swift in Sources */,
 				3A9E16151DE54604004DA53F /* Diagram.swift in Sources */,
 				3A56BC181DE115DD0025021E /* DiagramView.swift in Sources */,
 				3A56BC0C1DE10C410025021E /* MainWindowController.swift in Sources */,
 				3A56BC111DE10C410025021E /* ReferenceFinder.swift in Sources */,
 				3AB46EBB1DE6E79D00B4A009 /* IsNotZero.swift in Sources */,
+				3A95FE311E3C10E200C0DEDA /* CGPoint+midpoint.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

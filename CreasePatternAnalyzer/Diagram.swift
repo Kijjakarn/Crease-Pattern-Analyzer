@@ -9,10 +9,11 @@
 import Cocoa
 
 struct Diagram {
+    var rank    = 0
+    var fold:     LineReference!
     var creases = [LineReference]()
-    var fold:    LineReference!
-    var points = [PointReference]()
-    var lines  = [LineReference]()
-    var arrows = [Arrow]()
-    var bounds = NSRect()
+    var points  = [PointReference]()
+    var lines   = [LineReference]()
+    var arrows  = [Arrow]()
+    var bounds  = NSRect()
 }

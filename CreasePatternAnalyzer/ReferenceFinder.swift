@@ -70,7 +70,8 @@ class ReferenceFinder {
 
     var diagrams     = [Diagram]()
     var instructions = [String]()
-    var referenced   = [Reference]()
+    var referencedPoints = Set<PointReference>()
+    var referencedLines  = Set<LineReference>()
 
     private init() {}
 }

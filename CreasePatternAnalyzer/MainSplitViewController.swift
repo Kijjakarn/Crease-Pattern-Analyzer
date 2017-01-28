@@ -141,6 +141,6 @@ class MainSplitViewController: NSSplitViewController,
     }
 
     func updateDiagram() {
-        diagramView.needsDisplay = true
+        diagramView.drawAll()
     }
 }

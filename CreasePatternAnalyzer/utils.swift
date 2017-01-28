@@ -116,14 +116,17 @@ func coalesceInstructions() {
     var i = main.instructions.count - 2
     while i > 0 {
         if main.diagrams[i].fold == nil {
-            let oldFold: LineReference! = main.diagrams[i - 1].fold
-            let lines = main.diagrams[i].lines
-            if (lines[0].line == oldFold.line || lines[1].line == oldFold.line)
-            {
-                main.diagrams[i - 1].points.append(main.diagrams[i].points[0])
-                main.instructions[i - 1] += " " + main.instructions[i]
-                main.diagrams.remove(at: i)
-                main.instructions.remove(at: i)
+            if let oldFold = main.diagrams[i - 1].fold {
+                let lines = main.diagrams[i].lines
+                if (lines[0].line == oldFold.line
+                || lines[1].line == oldFold.line) {
+                    main.diagrams[i - 1].points.append(
+                        main.diagrams[i].points[0]
+                    )
+                    main.instructions[i - 1] += " " + main.instructions[i]
+                    main.diagrams.remove(at: i)
+                    main.instructions.remove(at: i)
+                }
             }
         }
         i -= 1
@@ -438,9 +441,10 @@ func makeInstructions(for reference: Reference) {
                 diagram.creases.append(oldFold)
             }
             // Delete old fold
-            diagram.fold = nil
-            diagram.lines = [line1, line2]
+            diagram.fold   = nil
+            diagram.lines  = [line1, line2]
             diagram.points = [point]
+            diagram.rank   = point.rank
 
             main.diagrams.append(diagram)
             main.instructions.append("The intersection between \(line1) "
@@ -766,6 +770,7 @@ func makeInstructions(for reference: Reference) {
         diagram.arrows = arrows
         diagram.points = points
         diagram.lines  = lines
+        diagram.rank   = line.rank
 
         diagram.creases.remove(elements: lines)
 
