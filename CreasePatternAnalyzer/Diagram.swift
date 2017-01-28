@@ -9,7 +9,6 @@
 import Cocoa
 
 struct Diagram {
-    var rank    = 0
     var fold:     LineReference!
     var creases = [LineReference]()
     var points  = [PointReference]()

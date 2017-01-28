@@ -10,7 +10,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="InstructionViewController" customModule="CreasePatternAnalyzer" customModuleProvider="target">
             <connections>
                 <outlet property="diagramView" destination="G3B-v3-bP4" id="HRg-OA-Bkn"/>
-                <outlet property="instruction" destination="wm9-K2-OBS" id="FJL-bs-5f8"/>
+                <outlet property="instruction" destination="yy6-Pk-kt2" id="X39-zr-2Sb"/>
                 <outlet property="nextButton" destination="hmo-YC-qNG" id="jyE-8b-IYV"/>
                 <outlet property="previousButton" destination="C0i-y5-VDF" id="lTD-UB-pPg"/>
                 <outlet property="view" destination="Lty-xK-oMU" id="aIH-pP-8bH"/>
@@ -79,17 +79,35 @@
                                 <constraint firstItem="C0i-y5-VDF" firstAttribute="leading" secondItem="KaZ-11-inB" secondAttribute="leading" id="yaY-q4-kBB"/>
                             </constraints>
                         </customView>
-                        <textField horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="wm9-K2-OBS">
+                        <scrollView wantsLayer="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IFB-GE-H34">
                             <rect key="frame" x="0.0" y="0.0" width="560" height="50"/>
+                            <clipView key="contentView" id="GbB-jZ-fzv">
+                                <rect key="frame" x="1" y="1" width="558" height="48"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <subviews>
+                                    <textView editable="NO" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="yy6-Pk-kt2">
+                                        <rect key="frame" x="0.0" y="0.0" width="558" height="48"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <size key="minSize" width="558" height="48"/>
+                                        <size key="maxSize" width="558" height="10000000"/>
+                                        <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    </textView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </clipView>
                             <constraints>
-                                <constraint firstAttribute="height" constant="50" id="Wto-Yn-nwq"/>
+                                <constraint firstAttribute="height" constant="50" id="0wR-OW-vwh"/>
                             </constraints>
-                            <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" drawsBackground="YES" id="AmN-sd-N2s">
-                                <font key="font" metaFont="system"/>
-                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                        </textField>
+                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="bUG-5y-SvD">
+                                <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                            </scroller>
+                            <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="259-FX-Ke0">
+                                <rect key="frame" x="543" y="1" width="16" height="48"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                            </scroller>
+                        </scrollView>
                     </subviews>
                     <constraints>
                         <constraint firstItem="KaZ-11-inB" firstAttribute="top" secondItem="G3B-v3-bP4" secondAttribute="bottom" constant="8" id="3Lz-Mw-1fd"/>
@@ -97,11 +115,7 @@
                         <constraint firstAttribute="trailing" secondItem="G3B-v3-bP4" secondAttribute="trailing" id="4sF-ro-uWr"/>
                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="560" id="7j1-N4-0nm"/>
                         <constraint firstItem="G3B-v3-bP4" firstAttribute="leading" secondItem="bdl-VJ-SF6" secondAttribute="leading" id="CHn-cb-QnZ"/>
-                        <constraint firstAttribute="trailing" secondItem="wm9-K2-OBS" secondAttribute="trailing" id="NY7-Wb-3e0"/>
-                        <constraint firstItem="wm9-K2-OBS" firstAttribute="leading" secondItem="bdl-VJ-SF6" secondAttribute="leading" id="Zqx-YV-vd9"/>
                         <constraint firstItem="KaZ-11-inB" firstAttribute="leading" secondItem="bdl-VJ-SF6" secondAttribute="leading" id="c22-Tg-WJO"/>
-                        <constraint firstItem="wm9-K2-OBS" firstAttribute="top" secondItem="KaZ-11-inB" secondAttribute="bottom" constant="8" id="ftQ-3E-ZU5"/>
-                        <constraint firstAttribute="bottom" secondItem="wm9-K2-OBS" secondAttribute="bottom" id="sM3-jg-lcv"/>
                         <constraint firstItem="G3B-v3-bP4" firstAttribute="top" secondItem="bdl-VJ-SF6" secondAttribute="top" id="wIa-NR-oiG"/>
                     </constraints>
                     <visibilityPriorities>

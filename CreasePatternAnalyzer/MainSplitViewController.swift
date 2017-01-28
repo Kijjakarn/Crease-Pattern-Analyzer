@@ -73,7 +73,7 @@ class MainSplitViewController: NSSplitViewController,
         main.diagrams.removeAll()
         main.instructions.removeAll()
         instructionVC.enableNextButton = false
-        instructionVC.instruction.stringValue = ""
+        instructionVC.instruction.string = ""
         instructionVC.diagramView.diagram = Diagram()
         instructionVC.diagramView.needsDisplay = true
     }

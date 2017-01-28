@@ -39,17 +39,17 @@ class InstructionViewController: NSViewController {
                 return
             }
             diagramView.diagram = main.diagrams[viewNumber]
-            if diagramView.diagram.rank == 0 {
+            if main.diagrams.count == 1 {
                 enableNextButton = false
             }
             CATransaction.commit()
-            instruction.stringValue = main.instructions[viewNumber]
+            instruction.string = main.instructions[viewNumber]
             diagramView.drawAll()
         }
     }
 
     @IBOutlet weak var diagramView:    DiagramView!
-    @IBOutlet weak var instruction:    NSTextField!
+    @IBOutlet weak var instruction:    NSTextView!
     @IBOutlet weak var nextButton:     NSButton!
     @IBOutlet weak var previousButton: NSButton!
 

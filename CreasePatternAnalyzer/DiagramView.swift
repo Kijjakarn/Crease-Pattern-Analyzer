@@ -396,9 +396,6 @@ class DiagramView: NSView {
                 let squaredRadius = pow((placement.x - labelCenter.x), 2)
                                   + pow((placement.y - labelCenter.y), 2)
                 if squaredRadius < minLabelRadiusSquared {
-                    Swift.print("Point: \((labelLayer as! CATextLayer).string)" +
-                        "squaredRadius: \(squaredRadius)\n" +
-                        "minLabelRadiusSquared: \(minLabelRadiusSquared)\n")
                     shouldMove = true
                 }
                 totalSquaredRadius += squaredRadius
