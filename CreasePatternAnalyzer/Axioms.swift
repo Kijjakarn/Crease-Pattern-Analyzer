@@ -30,12 +30,12 @@ func axiom2(_ p1: PointVector, _ p2: PointVector) -> Line? {
 // Axiom 3: Given two lines line1 and line2, we can fold line1 onto line2
 // - If lines are parallel, return one solution
 // - Otherwise, return line(s) contained in main.paper
-func axiom3(_ line1: Line, _ line2: Line, _ cond: Bool = false) -> [Line] {
+func axiom3(_ line1: Line, _ line2: Line) -> [Line] {
     guard let p = intersection(line1, line2) else {
         return [Line(distance: (line1.distance + line2.distance)/2,
                    unitNormal: line1.unitNormal)]
     }
-    let direction = ((line1.unitNormal + line2.unitNormal)/2).normalized()
+    let direction = (line1.unitNormal + line2.unitNormal).normalized()
     let fold1 = Line(point: p, unitNormal: direction)
     let fold2 = Line(point: p, unitNormal: direction.rotatedBy90())
     var folds = [Line]()

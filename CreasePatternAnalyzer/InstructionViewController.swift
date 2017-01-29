@@ -64,6 +64,7 @@ class InstructionViewController: NSViewController {
             object: nil
         )
         diagramView.delegate = parent as! DiagramViewDelegate
+        instruction.font = NSFont.systemFont(ofSize: 14)
     }
 
     @IBAction

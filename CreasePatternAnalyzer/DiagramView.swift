@@ -288,11 +288,45 @@ class DiagramView: NSView {
             ])
             pointLabelLayer.bounds = CGRect(origin: CGPoint.zero,
                                               size: size)
+            var offsetVector = angleDivider(pointReference.firstLine.line,
+                                            pointReference.secondLine.line)
+
+            // Reverse offset direction if the label will overlap with an arrow
+            for arrow in diagram.arrows {
+                let arrowPoints: [PointVector]
+                if arrow.beginPoint == pointReference.point {
+                    arrowPoints = arrow.arrowheadPoints()
+                }
+                else if arrow.endPoint == pointReference.point {
+                    arrowPoints = arrow.arrowtailPoints()
+                }
+                else {
+                    break
+                }
+                let arrowDirection =
+                    arrowPoints[2] - (arrowPoints[0] + arrowPoints[1])/2
+                if offsetVector.dot(arrowDirection) < 0 {
+                    offsetVector = offsetVector*(-1)
+                    break
+                }
+            }
             pointLabelLayer.position = CGPoint(
-                x: point.x + size.width/1.5,
-                y: point.y + size.height/1.5
+                x: point.x + size.width*CGFloat(offsetVector.x),
+                y: point.y + size.height*CGFloat(offsetVector.y)
             )
         }
+    }
+
+    // Return the line that divides the largest angle between `line1` and
+    // `line2` in half. This is a variation of the axiom3 function
+    func angleDivider(_ line1: Line, _ line2: Line) -> PointVector {
+        let divider1 = (line1.unitNormal + line2.unitNormal).normalized()
+        let divider2 = divider1.rotatedBy90()
+        if abs(divider1.dot(line1.unitNormal))
+         > abs(divider2.dot(line1.unitNormal)) {
+            return divider1
+        }
+        return divider2
     }
 
     func draw(line lineReference: LineReference, type: LineType = .crease) {

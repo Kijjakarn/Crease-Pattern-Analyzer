@@ -75,7 +75,7 @@ class MainSplitViewController: NSSplitViewController,
         instructionVC.enableNextButton = false
         instructionVC.instruction.string = ""
         instructionVC.diagramView.diagram = Diagram()
-        instructionVC.diagramView.needsDisplay = true
+        instructionVC.diagramView.drawAll()
     }
 
     // MARK: - ConfigurationViewControllerDelegate
