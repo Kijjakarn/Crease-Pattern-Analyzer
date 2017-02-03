@@ -9,7 +9,7 @@ class ReferenceFinder {
     var ε = 1e-8
     var εF: Float = 1e-8
 
-    var maxRank   = 4
+    var maxRank   = 5
     let axioms    = [3, 2, 7, 6, 5, 4, 1]
     var useAxioms = [true, true, true, true, true, true, true]
     var paper     = Rectangle(bottomLeft: PointVector(0, 0),
