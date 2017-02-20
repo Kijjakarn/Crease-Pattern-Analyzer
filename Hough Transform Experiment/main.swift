@@ -28,8 +28,7 @@ class Pixel {
 }
 
 class BinaryImage {
-    let image:     CGImage
-    let rawBitmap: CFData
+    let image: CGImage
     let name: String
 
     var result: [[Bool]]
@@ -37,37 +36,28 @@ class BinaryImage {
     let height: Int
 
     func write(appending word: String) throws {
-        let rawBitmapMutable = CFDataCreateMutableCopy(nil, 0, rawBitmap)!
+        let rawBitmap = CFDataCreateMutable(nil, 0)
         let fileName = FileManager.default.currentDirectoryPath + "/"
                      + (name as NSString).deletingPathExtension + word + "."
                      + (name as NSString).pathExtension
-        let bytesPerPixel = image.bitsPerPixel/8
         for j in 0..<height {
             for i in 0..<width {
                 var pixelValue: UInt8 = result[i][j] ? 0 : 255
-                let bitmapIndex = bytesPerPixel*(j*width + i)
-                for offset in 0..<bytesPerPixel {
-                    CFDataReplaceBytes(
-                        rawBitmapMutable,
-                        CFRange(location: bitmapIndex + offset, length: 1),
-                        &pixelValue,
-                        1
-                    )
-                }
+                CFDataAppendBytes(rawBitmap, &pixelValue, 1)
             }
         }
         let outputCGImage = CGImage(width: image.width,
                                    height: image.height,
-                         bitsPerComponent: image.bitsPerComponent,
-                             bitsPerPixel: image.bitsPerPixel,
-                              bytesPerRow: image.bytesPerRow,
-                                    space: image.colorSpace!,
-                               bitmapInfo: image.bitmapInfo,
-                                 provider: CGDataProvider(
-                                               data: rawBitmapMutable)!,
+                         bitsPerComponent: 8,
+                             bitsPerPixel: 8,
+                              bytesPerRow: image.width,
+                                    space: CGColorSpaceCreateDeviceGray(),
+                               bitmapInfo: CGBitmapInfo(rawValue: 0),
+                                 provider: CGDataProvider(data: rawBitmap!)!,
                                    decode: nil,
                         shouldInterpolate: false,
                                    intent: CGColorRenderingIntent.defaultIntent)
+
         let outputNSImage = NSImage(cgImage: outputCGImage!, size: NSSize())
         let outputTIFFData = outputNSImage.tiffRepresentation!
         let outputImageRep = NSBitmapImageRep(data: outputTIFFData)
@@ -86,7 +76,7 @@ class BinaryImage {
                                                    properties: [:])!
         _ = FileManager.default.createFile(atPath: fileName,
                                          contents: outputData)
-        print("\(fileName) written")
+        Swift.print("\(fileName) written")
     }
 
     // See: http://fourier.eng.hmc.edu/e161/lectures/morphology/node2.html
@@ -153,77 +143,8 @@ class BinaryImage {
         while shouldRepeat
     }
 
-    init(imageName: String) throws {
-        guard let image = NSImage(byReferencingFile: imageName)?.cgImage(
-            forProposedRect: nil,
-            context: nil,
-            hints: nil) else {
-            throw ImageProcessingError.fileDoesNotExist
-        }
-        self.image = image
-        name = imageName
-        var mapping = [Pixel]()
-        guard let rawBitmap = image.dataProvider?.data else {
-            throw ImageProcessingError.unsupportedFileType
-        }
-        self.rawBitmap = rawBitmap
-        let bitsPerComponent = image.bitsPerComponent
-        if bitsPerComponent != 8 {
-            throw ImageProcessingError.unsupportedFileType
-        }
-        width  = image.width
-        height = image.height
-        let bitsPerPixel = image.bitsPerPixel
-        let bytesPerPixel = bitsPerPixel/8
-        var currentY: Int = 0
-        var currentX: Int = 0
-
-        for i in stride(from: 0, to: CFDataGetLength(rawBitmap), by: bytesPerPixel)
-        {
-            var accumulated: UInt32 = 0
-            for offset in 0..<bytesPerPixel {
-                var component: UInt8 = 0
-                CFDataGetBytes(rawBitmap,
-                               CFRange(location: i + offset, length: 1),
-                               &component)
-                accumulated += UInt32(component)
-            }
-            if Int(currentX) >= width {
-                currentX = 0
-                currentY += 1
-            }
-            mapping.append(Pixel(value: accumulated, x: currentX, y: currentY))
-            currentX += 1
-        }
-        result = Array(repeating: Array(repeating: false, count: image.height),
-                               count: image.width)
-        var totalValue: UInt32 = 0
-        for pixel in mapping {
-            totalValue += pixel.value
-        }
-        let averageValue = UInt32(Double(totalValue)/Double(mapping.count))
-
-        // Count the number of pixels that have less than average pixel value
-        var numPixelsLess = 0
-        for pixel in mapping {
-            if pixel.value < averageValue {
-                numPixelsLess += 1
-            }
-        }
-        // Remapping
-        var shouldAssignTrue: (Pixel) -> Bool = { $0.value > averageValue }
-        if 2*numPixelsLess < mapping.count {
-            shouldAssignTrue = { $0.value < averageValue }
-        }
-        for pixel in mapping {
-            if shouldAssignTrue(pixel) {
-                result[pixel.x][pixel.y] = true
-            }
-            else {
-                result[pixel.x][pixel.y] = false
-            }
-        }
-        // Remove pixels without an immediate neighbor (noise)
+    // Remove pixels without an immediate neighbor
+    func removeNoise() {
         for i in 1..<(width - 2) {
             for j in 1..<(height - 2) {
                 if result[i][j] && !(result[  i  ][j - 1]
@@ -240,8 +161,160 @@ class BinaryImage {
             }
         }
     }
+
+    init(imageName: String) throws {
+        guard let image = NSImage(byReferencingFile: imageName)?.cgImage(
+            forProposedRect: nil,
+            context: nil,
+            hints: nil) else {
+            throw ImageProcessingError.fileDoesNotExist
+        }
+        self.image = image
+        name = imageName
+        var mapping = [Pixel]()
+        guard let rawBitmap = image.dataProvider?.data else {
+            throw ImageProcessingError.unsupportedFileType
+        }
+        let bitsPerComponent = image.bitsPerComponent
+        if bitsPerComponent != 8 {
+            throw ImageProcessingError.unsupportedFileType
+        }
+        width  = image.width
+        height = image.height
+        let bitsPerPixel = image.bitsPerPixel
+        let bytesPerPixel = bitsPerPixel/8
+        var currentY: Int = 0
+        var currentX: Int = 0
+        var grayImage = Array(
+            repeating: Array(repeating: UInt32(0), count: height),
+            count: width
+        )
+
+        for i in stride(from: 0,
+                          to: CFDataGetLength(rawBitmap),
+                          by: bytesPerPixel)
+        {
+            var accumulated: UInt32 = 0
+            for offset in 0..<bytesPerPixel {
+                var component: UInt8 = 0
+                CFDataGetBytes(rawBitmap,
+                               CFRange(location: i + offset, length: 1),
+                               &component)
+                accumulated += UInt32(component)
+            }
+            if Int(currentX) >= width {
+                currentX = 0
+                currentY += 1
+            }
+            let grayValue = UInt32(Double(accumulated)/Double(bytesPerPixel))
+            grayImage[currentX][currentY] = grayValue
+            currentX += 1
+        }
+        let blurredImage = gaussianBlur(image: grayImage)
+
+        var histogram = Array(repeating: 0, count: 256)
+        for i in 0..<width {
+            for j in 0..<height {
+                let value = blurredImage[i][j]
+                histogram[Int(value)] += 1
+                mapping.append(Pixel(value: value, x: currentX, y: currentY))
+            }
+        }
+        let threshold = UInt32(otsu(histogram: histogram,
+                                    numPixels: width*height))
+
+        // Count the number of pixels that have less than average pixel value
+        var numPixelsLess = 0
+        for pixel in mapping {
+            if pixel.value < threshold {
+                numPixelsLess += 1
+            }
+        }
+        // Remapping
+        var shouldAssignTrue: (UInt32) -> Bool = { $0 >= threshold }
+        if 2*numPixelsLess < mapping.count {
+            shouldAssignTrue = { $0 <= threshold }
+        }
+        result = Array(repeating: Array(repeating: false, count: image.height),
+                           count: image.width)
+        for i in 0..<width {
+            for j in 0..<height {
+                result[i][j] = shouldAssignTrue(blurredImage[i][j])
+            }
+        }
+    }
 }
 
+func gaussianBlur(image: [[UInt32]]) -> [[UInt32]] {
+    if image.isEmpty {
+        return []
+    }
+    let width = image.count
+    let height = image[0].count
+
+    // Kernel with sigma = 0.3
+    let kernel: [Double] = [0.04779, 0.90442, 0.04779]
+    let radius = (kernel.count - 1)/2
+    var imageV: [[Double]] = image.map { $0.map {
+        (element: UInt32) in return Double(element)
+    }}
+    for i in 0..<width {
+        for j in radius..<(height - radius) {
+            var value = 0.0
+            for k in 0..<kernel.count {
+                value += kernel[k]*Double(image[i][j + k - radius])
+            }
+            imageV[i][j] = value
+        }
+    }
+    var imageVH = imageV
+    for j in 0..<height {
+        for i in radius..<(width - radius) {
+            var value = 0.0
+            for k in 0..<kernel.count {
+                value += kernel[k]*imageV[i + k - radius][j]
+            }
+            imageVH[i][j] = value
+        }
+    }
+    return imageVH.map { $0.map {
+        (element: Double) in return UInt32(element)
+    }}
+}
+
+func otsu(histogram: [Int], numPixels: Int) -> Int {
+    var sum = 0
+    for i in 0..<256 {
+        sum += i*histogram[i]
+    }
+    var sumB = 0
+    var wB = 0
+    var wF = 0
+    var varianceMax = 0
+    var threshold = 0
+    for i in 0..<256 {
+        wB += histogram[i]
+        if wB == 0 {
+            continue
+        }
+        wF = numPixels - wB
+        if wF == 0 {
+            break
+        }
+        sumB += i*histogram[i]
+        let mB = sumB/wB
+        let mF = (sum - sumB)/wF
+
+        // Variance between classes
+        let varianceBetween = wB*wF*(mB - mF)*(mB - mF)
+
+        if varianceBetween > varianceMax {
+            varianceMax = varianceBetween
+            threshold = i
+        }
+    }
+    return threshold
+}
 
 func houghTransform(binaryImage image: [[Bool]]) {
     let rows = image.count
@@ -288,7 +361,7 @@ let imageName = CommandLine.arguments[1]
 let image: BinaryImage
 do {
     try image = BinaryImage(imageName: imageName)
-    try image.write(appending: " quantized")
+    try image.write(appending: " binarized")
     image.thin()
     try image.write(appending: " thinned")
 }
