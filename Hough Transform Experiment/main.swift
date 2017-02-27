@@ -3,6 +3,9 @@ import Cocoa
 let ε = 1e-8
 let εF: Float = 1e-8
 let π = M_PI
+let defaultDirectory =
+    FileManager.default.homeDirectoryForCurrentUser.relativePath +
+    "/CreasePatternAnalyzer/Hough Transform Experiment/Test Images/"
 
 extension Bool {
     var int: Int {
@@ -18,9 +21,9 @@ enum ImageProcessingError: Error {
 class Pixel {
     var x:     Int
     var y:     Int
-    var value: UInt32
+    var value: UInt8
 
-    init(value: UInt32, x: Int, y: Int) {
+    init(value: UInt8, x: Int, y: Int) {
         self.value = value
         self.x = x
         self.y = y
@@ -29,15 +32,16 @@ class Pixel {
 
 class BinaryImage {
     let image: CGImage
-    let name: String
+    let name:  String
 
     var result: [[Bool]]
     let width:  Int
     let height: Int
 
     func write(appending word: String) throws {
-        let rawBitmap = CFDataCreateMutable(nil, 0)
-        let fileName = FileManager.default.currentDirectoryPath + "/"
+        let rawBitmap = CFDataCreateMutable(nil, width*height)
+        let fileName = // FileManager.default.currentDirectoryPath + "/"
+                        defaultDirectory
                      + (name as NSString).deletingPathExtension + word + "."
                      + (name as NSString).pathExtension
         for j in 0..<height {
@@ -58,7 +62,7 @@ class BinaryImage {
                         shouldInterpolate: false,
                                    intent: CGColorRenderingIntent.defaultIntent)
 
-        let outputNSImage = NSImage(cgImage: outputCGImage!, size: NSSize())
+        let outputNSImage  = NSImage(cgImage: outputCGImage!, size: NSSize())
         let outputTIFFData = outputNSImage.tiffRepresentation!
         let outputImageRep = NSBitmapImageRep(data: outputTIFFData)
         let fileType: NSBitmapImageFileType
@@ -144,6 +148,7 @@ class BinaryImage {
     }
 
     // Remove pixels without an immediate neighbor
+    // Won't be used anywhere
     func removeNoise() {
         for i in 1..<(width - 2) {
             for j in 1..<(height - 2) {
@@ -163,76 +168,88 @@ class BinaryImage {
     }
 
     init(imageName: String) throws {
-        guard let image = NSImage(byReferencingFile: imageName)?.cgImage(
-            forProposedRect: nil,
-            context: nil,
-            hints: nil) else {
+        // Create a CGImage through an NSImage
+        guard var image = NSImage(
+            byReferencingFile: defaultDirectory + imageName)?
+            .cgImage(forProposedRect: nil,
+                             context: nil,
+                               hints: nil
+        )
+        else {
             throw ImageProcessingError.fileDoesNotExist
         }
-        self.image = image
-        name = imageName
-        var mapping = [Pixel]()
+        // Convert the image to gray scale color space
+        guard let context = CGContext(
+            data: nil,
+            width: image.width,
+            height: image.height,
+            bitsPerComponent: 8,
+            bytesPerRow: image.width,
+            space: CGColorSpaceCreateDeviceGray(),
+            bitmapInfo: CGImageAlphaInfo.none.rawValue
+        )
+        else {
+            throw ImageProcessingError.unsupportedFileType
+        }
+        context.draw(
+            image,
+            in: CGRect(x: 0, y: 0, width: image.width, height: image.height)
+        )
+        image = context.makeImage()!
+
+        // Perform checks on the image's file type
         guard let rawBitmap = image.dataProvider?.data else {
             throw ImageProcessingError.unsupportedFileType
         }
-        let bitsPerComponent = image.bitsPerComponent
-        if bitsPerComponent != 8 {
-            throw ImageProcessingError.unsupportedFileType
-        }
+        self.image = image
+        name   = imageName
         width  = image.width
         height = image.height
-        let bitsPerPixel = image.bitsPerPixel
-        let bytesPerPixel = bitsPerPixel/8
-        var currentY: Int = 0
-        var currentX: Int = 0
+        let numPixels = width*height
+
+        // Create a gray-scale image from the pixel values
         var grayImage = Array(
-            repeating: Array(repeating: UInt32(0), count: height),
+            repeating: Array(repeating: UInt8(0), count: height),
             count: width
         )
-
-        for i in stride(from: 0,
-                          to: CFDataGetLength(rawBitmap),
-                          by: bytesPerPixel)
-        {
-            var accumulated: UInt32 = 0
-            for offset in 0..<bytesPerPixel {
-                var component: UInt8 = 0
-                CFDataGetBytes(rawBitmap,
-                               CFRange(location: i + offset, length: 1),
-                               &component)
-                accumulated += UInt32(component)
-            }
+        var currentX = 0
+        var currentY = 0
+        for i in 0..<numPixels {
+            var value: UInt8 = 0
+            CFDataGetBytes(rawBitmap, CFRange(location: i, length: 1), &value)
             if Int(currentX) >= width {
                 currentX = 0
                 currentY += 1
             }
-            let grayValue = UInt32(Double(accumulated)/Double(bytesPerPixel))
-            grayImage[currentX][currentY] = grayValue
+            grayImage[currentX][currentY] = value
             currentX += 1
         }
         let blurredImage = gaussianBlur(image: grayImage)
 
+        // Find the binarization threshold using Otsu's method
         var histogram = Array(repeating: 0, count: 256)
         for i in 0..<width {
             for j in 0..<height {
                 let value = blurredImage[i][j]
                 histogram[Int(value)] += 1
-                mapping.append(Pixel(value: value, x: currentX, y: currentY))
             }
         }
-        let threshold = UInt32(otsu(histogram: histogram,
-                                    numPixels: width*height))
+        let threshold = UInt8(otsu(histogram: histogram,
+                                   numPixels: numPixels))
 
         // Count the number of pixels that have less than average pixel value
+        // These pixels will be assigned to true; the others to false
         var numPixelsLess = 0
-        for pixel in mapping {
-            if pixel.value < threshold {
-                numPixelsLess += 1
+        for i in 0..<width {
+            for j in 0..<height {
+                if blurredImage[i][j] < threshold {
+                    numPixelsLess += 1
+                }
             }
         }
-        // Remapping
-        var shouldAssignTrue: (UInt32) -> Bool = { $0 >= threshold }
-        if 2*numPixelsLess < mapping.count {
+        // Remap gray values to binary
+        var shouldAssignTrue: (UInt8) -> Bool = { $0 >= threshold }
+        if 2*numPixelsLess < numPixels {
             shouldAssignTrue = { $0 <= threshold }
         }
         result = Array(repeating: Array(repeating: false, count: image.height),
@@ -245,19 +262,23 @@ class BinaryImage {
     }
 }
 
-func gaussianBlur(image: [[UInt32]]) -> [[UInt32]] {
+func gaussianBlur(image: [[UInt8]]) -> [[UInt8]] {
     if image.isEmpty {
         return []
     }
     let width = image.count
     let height = image[0].count
 
-    // Kernel with sigma = 0.3
-    let kernel: [Double] = [0.04779, 0.90442, 0.04779]
+    // Kernel with radius = 1 and sigma = 0.15
+    let kernel: [Double] = [0.000429, 0.999142, 0.000429]
+
+    // Kernel with radius = 1 and sigma = 0.30
+    // let kernel: [Double] = [0.04779, 0.90442, 0.04779]
     let radius = (kernel.count - 1)/2
     var imageV: [[Double]] = image.map { $0.map {
-        (element: UInt32) in return Double(element)
+        (element: UInt8) in return Double(element)
     }}
+    // 1D Gausssian blur in the vertical direction
     for i in 0..<width {
         for j in radius..<(height - radius) {
             var value = 0.0
@@ -267,6 +288,7 @@ func gaussianBlur(image: [[UInt32]]) -> [[UInt32]] {
             imageV[i][j] = value
         }
     }
+    // 1D Gausssian blur in the horizontal direction
     var imageVH = imageV
     for j in 0..<height {
         for i in radius..<(width - radius) {
@@ -278,7 +300,7 @@ func gaussianBlur(image: [[UInt32]]) -> [[UInt32]] {
         }
     }
     return imageVH.map { $0.map {
-        (element: Double) in return UInt32(element)
+        (element: Double) in return UInt8(element)
     }}
 }
 
@@ -316,20 +338,21 @@ func otsu(histogram: [Int], numPixels: Int) -> Int {
     return threshold
 }
 
-func houghTransform(binaryImage image: [[Bool]]) {
-    let rows = image.count
-    let cols = image[0].count
-    let numRhos   = Int(sqrt(Double(rows*rows + cols*cols))) + 1
-    let numThetas = 360
+// Return an array of lines, sorted by frequency
+func houghTransform(binaryImage image: [[Bool]]) -> [Line] {
+    let width       = image.count
+    let height      = image[0].count
+    let numRhos     = Int(sqrt(Double(width*width + height*height))) + 1
+    let numThetas   = 360
     var accumulator = Array(repeating: Array(repeating: 0, count: numThetas),
                                 count: numRhos)
-    for i in 0..<rows {
-        for j in 0..<cols {
+    for i in 0..<width {
+        for j in 0..<height {
             if image[i][j] {
                 for theta in 0..<numThetas {
-                    let radiansTheta = Double(theta)*π/180
-                    var rho = Int(Double(i)*sin(radiansTheta)
-                                + Double(cols - j)*cos(radiansTheta))
+                    let thetaRadians = Double(theta)*π/180
+                    var rho = Int(Double(i)*sin(thetaRadians)
+                                + Double(height - j)*cos(thetaRadians))
                     var newTheta = theta
                     if rho < 0 {
                         rho = -rho
@@ -340,29 +363,41 @@ func houghTransform(binaryImage image: [[Bool]]) {
             }
         }
     }
-    var maxRhoIndex   = 0
-    var maxThetaIndex = 0
+    // Make a pair of lines and their frequency of occurrence
+    var linesCount = [(line: Line, count: Int)]()
     for theta in 0..<numThetas {
         for rho in 0..<numRhos {
-            if accumulator[rho][theta]
-             > accumulator[maxRhoIndex][maxThetaIndex] {
-                maxRhoIndex = rho
-                maxThetaIndex = theta
+            if accumulator[rho][theta] > 0 {
+                let line = Line(distance: Double(rho),
+                              unitNormal: PointVector(sin(Double(theta)*π/180),
+                                                      cos(Double(theta)*π/180)))
+                linesCount.append((line, accumulator[rho][theta]))
             }
         }
     }
-    let bestLine = Line(distance: Double(maxRhoIndex),
-                      unitNormal: PointVector(sin(Double(maxThetaIndex)*π/180),
-                                              cos(Double(maxThetaIndex)*π/180)))
-    print("Most prominent line: \(bestLine)")
+    // Sort the pairs by count
+    linesCount.sort(by: {
+        return $0.count > $1.count
+    })
+    // Print the first 50 lines
+    for i in 0..<50 {
+        let (line, count) = linesCount[i]
+        print("\(count): \(line)")
+    }
+    return linesCount.map { $0.line }
 }
 
-let imageName = CommandLine.arguments[1]
-let image: BinaryImage
-do {
-    try image = BinaryImage(imageName: imageName)
-    try image.write(appending: " binarized")
-    image.thin()
-    try image.write(appending: " thinned")
+for i in 1..<CommandLine.arguments.count {
+    let imageName = CommandLine.arguments[i]
+    let image: BinaryImage
+    do {
+        try image = BinaryImage(imageName: imageName)
+        try image.write(appending: " binarized")
+        image.thin()
+        try image.write(appending: " thinned")
+        _ = houghTransform(binaryImage: image.result)
+    }
+    catch let error {
+        print(error)
+    }
 }
-catch {}
