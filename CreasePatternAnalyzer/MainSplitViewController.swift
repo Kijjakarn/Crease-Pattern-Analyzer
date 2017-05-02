@@ -9,6 +9,7 @@
 import Cocoa
 
 class MainSplitViewController: NSSplitViewController,
+                               MainWindowControllerDelegate,
                                PointViewControllerDelegate,
                                ConfigurationViewControllerDelegate,
                                InstructionViewControllerDelegate,
@@ -45,6 +46,7 @@ class MainSplitViewController: NSSplitViewController,
             as! InstructionViewController
         diagramView = instructionVC.diagramView
 
+        // Set the delegates
         pointVC.delegate         = self
         configurationVC.delegate = self
         instructionVC.delegate   = self
@@ -64,6 +66,37 @@ class MainSplitViewController: NSSplitViewController,
         if keyPath == "operationCount" {
             hasFinishedInitialization = initializationQueue.operationCount == 0
             CATransaction.commit()
+        }
+    }
+
+    // MARK: - MainWindowControllerDelegate
+
+    // Load and perform Hough transform on image
+    func processImage(url: URL) {
+        let image: BinaryImage
+        do {
+            try image = BinaryImage(fileURL: url)
+            try image.write(appending: " binarized")
+            image.thin()
+            try image.write(appending: " thinned")
+            var diagram = Diagram()
+            diagram.lineSegments = getLineSegments(binaryImage: image.result).map {
+                (p1, p2) in
+                let width  = Double(image.width)
+                let height = Double(image.height)
+                return (PointVector(p1.0/width, (height - p1.1)/width),
+                        PointVector(p2.0/width, (height - p2.1)/width))
+            }
+            main.paper = Rectangle(
+                width: 1,
+                height: Double(image.height)/Double(image.width)
+            )
+            diagramView.diagram = diagram
+            diagramView.drawAll()
+            CATransaction.commit()
+        }
+        catch {
+            print("Cannot process image")
         }
     }
 

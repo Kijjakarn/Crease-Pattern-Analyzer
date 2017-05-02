@@ -339,7 +339,7 @@ class Parser {
                     case "p", "e", "d":
                         operatorPushed = false
                         switch functionName {
-                        case "p": operands.append(M_PI)
+                        case "p": operands.append(Double.pi)
                         case "e": operands.append(M_E)
                         case "d": operands.append(sqrt(2))
                         default: break

@@ -22,7 +22,7 @@ class PointReference: NSObject, Reference {
 
     var rank = 0
 
-    var distanceError = DBL_MAX
+    var distanceError = Double.greatestFiniteMagnitude
 
     var label: String = "_"
 
@@ -78,13 +78,13 @@ class LineReference: NSObject, Reference {
 
     var rank = 0
 
-    var shiftError = DBL_MAX
-    var angleError = DBL_MAX
+    var shiftError = Double.greatestFiniteMagnitude
+    var angleError = Double.greatestFiniteMagnitude
 
     var label: String = "_"
 
     func isNotEdge() -> Bool {
-        return label.characters.count == 1
+        return label.characters.count <= 1
     }
 
     override var hashValue: Int {

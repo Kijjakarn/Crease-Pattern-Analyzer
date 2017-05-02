@@ -9,7 +9,7 @@ class ReferenceFinder {
     var ε = 1e-8
     var εF: Float = 1e-8
 
-    var maxRank   = 5
+    var maxRank   = 4
     let axioms    = [3, 2, 7, 6, 5, 4, 1]
     var useAxioms = [true, true, true, true, true, true, true]
     var paper     = Rectangle(bottomLeft: PointVector(0, 0),
@@ -72,6 +72,8 @@ class ReferenceFinder {
     var instructions = [String]()
     var referencedPoints = Set<PointReference>()
     var referencedLines  = Set<LineReference>()
+
+    var detectedLines = [Line]()
 
     private init() {}
 }

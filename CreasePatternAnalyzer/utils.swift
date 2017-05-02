@@ -11,7 +11,7 @@ import Darwin
                 Utility Functions Called from View Controllers
 -----------------------------------------------------------------------------*/
 
-let π = M_PI
+let π = Double.pi
 
 extension Array where Element: Equatable {
     mutating func remove(elements: [Element]) {
@@ -40,8 +40,7 @@ func /(left: Int, right: Int) -> Int {
     return Int(floor(Double(left)/Double(right)))
 }
 
-func makeAllPointsAndLines() {
-    // Clear old points and lines
+func clearAllPointsAndLines() {
     main.numLines = 0
     main.numPoints = 0
     main.allPoints.removeAll()
@@ -50,6 +49,10 @@ func makeAllPointsAndLines() {
     main.referencedLines.removeAll()
     main.diagrams.removeAll()
     main.instructions.removeAll()
+}
+
+func makeAllPointsAndLines() {
+    clearAllPointsAndLines()
 
     // Use paper's corners as point references and edges as line references
     main.allPoints.append(main.paper.corners)

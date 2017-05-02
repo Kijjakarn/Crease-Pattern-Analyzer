@@ -136,10 +136,13 @@ class DiagramView: NSView {
         if let fold = diagram.fold {
             draw(line: fold, type: .fold)
         }
+        for (p1, p2) in diagram.lineSegments {
+            draw(from: p1, to: p2)
+        }
     }
 
     @objc func updatePaddingAndDrawAll(_ note: Notification) {
-        padding = Double(min(frame.size.width/6, frame.size.height/6))
+        padding = Double(min(frame.size.width/12, frame.size.height/12))
         drawAll()
     }
 
@@ -359,6 +362,21 @@ class DiagramView: NSView {
                 }
             }
         }
+    }
+
+    func draw(from p1: PointVector, to p2: PointVector) {
+        // print("Drawing line connecting points \(p1) \(p2)")
+        let line = CGMutablePath()
+        line.move(to: viewPoint(from: p1))
+        line.addLine(to: viewPoint(from: p2))
+        let lineLayer = CAShapeLayer()
+        linesLayer.addSublayer(lineLayer)
+        lineLayer.path = line
+        lineLayer.bounds = bounds
+        lineLayer.position = CGPoint(x: bounds.midX, y: bounds.midY)
+
+        // Draw solid black line
+        lineLayer.strokeColor = CGColor.black
     }
 
     func drawLabel(forLine lineReference: LineReference,
