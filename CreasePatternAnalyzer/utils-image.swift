@@ -1,6 +1,7 @@
 import Cocoa
 
 typealias Point = (Double, Double)
+typealias PointInt = (Int, Int)
 
 extension Bool {
     var int: Int {
@@ -491,10 +492,7 @@ func neighboringPixelsValue(image: [[Bool]], x: Int, y: Int, radius: Int = 1)
         -> Int {
     let width  = image.count
     let height = image[0].count
-    if x < 0 || x >= width {
-        return 0
-    }
-    if y < 0 || y >= height {
+    if x < 0 || x >= width || y < 0 || y >= height {
         return 0
     }
     var sum = 0
@@ -510,36 +508,195 @@ func neighboringPixelsValue(image: [[Bool]], x: Int, y: Int, radius: Int = 1)
     return sum
 }
 
-func getLineSegments(binaryImage image: [[Bool]]) -> [(Point, Point)] {
+/* // Sum the pixel values of the 3 x 3 square centered at (x, y)
+// A neighbor that is out of bounds is considered to have a value of 0
+func neighboringPixelsValue(image: [[Bool]], x: Int, y: Int, radius: Int = 1)
+        -> Int {
+    let width  = image.count
+    let height = image[0].count
+
+    func pixelValue(_ x: Int, _ y: Int) -> Int {
+        if x < 0 || x >= width || y < 0 || y >= height {
+            return 0
+        }
+        return image[x][y] ? 1 : 0
+    }
+
+    let sum = pixelValue(x, y)
+            + pixelValue(x - 1, y)
+            + pixelValue(x + 1, y)
+            + pixelValue(x, y - 1)
+            + pixelValue(x, y + 1)
+
+    return (sum == 0 || sum > 3) ? 0 : 1
+} */
+
+/* // A neighbor that is out of bounds is considered to have a value of 0
+// `theta` is in the range [0, 360) degrees
+func neighboringPixelsValue(
+        image: [[Bool]], x: Int, y: Int, theta: Double) -> Int {
+    let width  = image.count
+    let height = image[0].count
+
+    func pixelValue(_ x: Int, _ y: Int) -> Int {
+        if x < 0 || x >= width || y < 0 || y >= height {
+            return 0
+        }
+        return image[x][y] ? 1 : 0
+    }
+
+    if theta <= 22.5 {
+        // return pixelValue(x, y)
+        //      + pixelValue(x - 1, y)
+        //      + pixelValue(x - 1, y - 1)
+        //      + pixelValue(x - 1, y + 1)
+        return pixelValue(x, y)
+             + pixelValue(x, y - 1)
+             + pixelValue(x, y + 1)
+             + pixelValue(x - 1, y)
+             + pixelValue(x - 1, y - 1)
+             + pixelValue(x - 1, y + 1)
+    }
+    if theta <= 67.5 {
+        // return pixelValue(x, y)
+        //      + pixelValue(x, y + 1)
+        //      + pixelValue(x - 1, y)
+        //      + pixelValue(x - 1, y + 1)
+        return pixelValue(x, y)
+             + pixelValue(x, y + 1)
+             + pixelValue(x - 1, y)
+             + pixelValue(x - 1, y + 1)
+             + pixelValue(x - 1, y - 1)
+             + pixelValue(x + 1, y + 1)
+    }
+    if theta <= 112.5 {
+        return pixelValue(x, y)
+             + pixelValue(x, y + 1)
+             + pixelValue(x - 1, y + 1)
+             + pixelValue(x + 1, y + 1)
+        return pixelValue(x, y)
+             + pixelValue(x, y + 1)
+             + pixelValue(x - 1, y)
+             + pixelValue(x - 1, y + 1)
+             + pixelValue(x + 1, y)
+             + pixelValue(x + 1, y + 1)
+    }
+    if theta <= 157.5 {
+        return pixelValue(x, y)
+             + pixelValue(x + 1, y + 1)
+             + pixelValue(x + 1, y)
+             + pixelValue(x + 1, y + 1)
+        return pixelValue(x, y)
+             + pixelValue(x, y + 1)
+             + pixelValue(x - 1, y + 1)
+             + pixelValue(x + 1, y + 1)
+             + pixelValue(x + 1, y)
+             + pixelValue(x + 1, y + 1)
+    }
+    if theta <= 202.5 {
+        return pixelValue(x, y)
+             + pixelValue(x + 1, y)
+             + pixelValue(x + 1, y - 1)
+             + pixelValue(x + 1, y + 1)
+        return pixelValue(x, y)
+             + pixelValue(x, y - 1)
+             + pixelValue(x, y + 1)
+             + pixelValue(x + 1, y)
+             + pixelValue(x + 1, y - 1)
+             + pixelValue(x + 1, y + 1)
+    }
+    if theta <= 247.5 {
+        return pixelValue(x, y)
+             + pixelValue(x, y - 1)
+             + pixelValue(x + 1, y)
+             + pixelValue(x + 1, y - 1)
+        return pixelValue(x, y)
+             + pixelValue(x, y - 1)
+             + pixelValue(x - 1, y - 1)
+             + pixelValue(x + 1, y)
+             + pixelValue(x + 1, y - 1)
+             + pixelValue(x + 1, y + 1)
+    }
+    if theta <= 292.5 {
+        return pixelValue(x, y)
+             + pixelValue(x, y - 1)
+             + pixelValue(x - 1, y - 1)
+             + pixelValue(x + 1, y - 1)
+        return pixelValue(x, y)
+             + pixelValue(x, y - 1)
+             + pixelValue(x - 1, y)
+             + pixelValue(x - 1, y - 1)
+             + pixelValue(x + 1, y)
+             + pixelValue(x + 1, y - 1)
+    }
+    if theta <= 337.5 {
+        return pixelValue(x, y)
+             + pixelValue(x, y - 1)
+             + pixelValue(x - 1, y)
+             + pixelValue(x - 1, y - 1)
+        return pixelValue(x, y)
+             + pixelValue(x, y - 1)
+             + pixelValue(x - 1, y)
+             + pixelValue(x - 1, y - 1)
+             + pixelValue(x - 1, y + 1)
+             + pixelValue(x + 1, y - 1)
+    }
+    return pixelValue(x, y)
+         + pixelValue(x - 1, y)
+         + pixelValue(x - 1, y - 1)
+         + pixelValue(x - 1, y + 1)
+    return pixelValue(x, y)
+         + pixelValue(x, y - 1)
+         + pixelValue(x, y + 1)
+         + pixelValue(x - 1, y)
+         + pixelValue(x - 1, y - 1)
+         + pixelValue(x - 1, y + 1)
+} */
+
+// Return the distance between two points
+func distance(_ a: Point, _ b: Point) -> Double {
+    let deltaX = a.0 - b.0
+    let deltaY = a.1 - b.1
+    return sqrt(deltaX*deltaX + deltaY*deltaY)
+}
+
+func getLineSegments(binaryImage image: [[Bool]], comparisonImage: [[Bool]])
+  -> [(Point, Point)] {
     let width         = Double(image.count)
     let height        = Double(image[0].count)
-    let thetaFraction = 1.0
-    let rhoFraction   = 1.0
+    let thetaFraction = 3.0
+    let rhoFraction   = 2.0
     /* var accumulator   = houghTransform(binaryImage: image,
                                      thetaFraction: Int(thetaFraction),
                                        rhoFraction: Int(rhoFraction)) */
-    var accumulator   = houghTransformCenter(binaryImage: image,
-                                           thetaFraction: Int(thetaFraction),
-                                             rhoFraction: Int(rhoFraction))
+    var accumulator = houghTransformCenter(binaryImage: image,
+                                         thetaFraction: Int(thetaFraction),
+                                           rhoFraction: Int(rhoFraction))
     let thetasCount = accumulator.count
     let rhosCount   = accumulator[0].count
     let rhoOffset   = (rhosCount - 1)/2
-    let iterationsCount = 1
+    let iterationsCount = 50
     var allLineSegments = [(Point, Point)]()
+    // print(accumulator)
+
+    // Minimum length of each line segment
+    let lengthMin = sqrt(width*width + height*height)/50
 
     // Extract line segments corresponding to each peak
     for i in 0..<iterationsCount {
+        print("Iteration \(i)")
         // let (thetaIndex, rhoIndex) = maxIndex(in: accumulator, radius: 1)
         let (thetaIndex, rhoIndex) = maxIndex(in: accumulator, radius: 1)
         let rho   = Double(rhoIndex - rhoOffset)/rhoFraction
         let theta = Double(thetaIndex)*π/180/thetaFraction
         /* let endpoints = clip(width: width, height: height,
                              theta: theta, rho: rho) */
-        let endpoints = clip(width: width,
-                            height: height,
-                             theta: theta,
-                               rho: rho + 0.5*(height*sin(theta)
-                                              + width*cos(theta)))
+        let endpoints = clip(
+            width: width,
+            height: height,
+            theta: theta,
+            rho: rho + 0.5*(height*sin(theta) + width*cos(theta))
+        )
         if endpoints.count < 2 {
             continue
         }
@@ -549,6 +706,7 @@ func getLineSegments(binaryImage image: [[Bool]]) -> [(Point, Point)] {
         let y1 = endpoints[1].1
         let dx = x1 - x0
         let dy = y1 - y0
+        let angle = atan2(dy, dx)*180/π
         let length = Int(sqrt(dx*dx + dy*dy))
 
         func xValue(_ t: Int) -> Double {
@@ -558,36 +716,243 @@ func getLineSegments(binaryImage image: [[Bool]]) -> [(Point, Point)] {
             return y0 + dy*Double(t)/Double(length)
         }
 
-        let gapMax = 2
+        let gapMax = 3
         var gap    = 0
         var begin  = (xValue(0), yValue(0))
-        var lineSegments = [(Point, Point)]()
+        var lineSegments   = [(Point, Point)]()
+        var pointsToRemove = [Point]()
+
         for t in 0..<length {
             let x = xValue(t)
             let y = yValue(t)
             if neighboringPixelsValue(image: image, x: Int(x), y: Int(y)) > 0 {
+                pointsToRemove.append((x, y))
                 if gap > gapMax {
                     begin = (x, y)
                 }
                 if t == length - 1 {
-                    lineSegments.append((begin, (x, y)))
+                    let newPoint = (x, y)
+                    if distance(begin, newPoint) >= lengthMin {
+                        lineSegments.append((begin, newPoint))
+                    }
                 }
                 gap = 0
             }
             else {
                 if gap == gapMax {
                     let tEnd = t - gap
-                    lineSegments.append((begin, (xValue(tEnd), yValue(tEnd))))
+                    let newPoint = (xValue(tEnd), yValue(tEnd))
+                    if distance(begin, newPoint) >= lengthMin {
+                        lineSegments.append((begin, newPoint))
+                    }
                 }
                 gap += 1
             }
         }
 
-        // TODO: Remove the line segments' votes from the accumulator
+        // Remove the line segments' votes from the accumulator
+        for pointToRemove in pointsToRemove {
+            for thetaIndex in 0..<thetasCount {
+                let theta = Double(thetaIndex)/Double(thetaFraction)*π/180
+                let rho = (pointToRemove.0 -  width/2)*cos(theta)
+                        + (pointToRemove.1 - height/2)*sin(theta)
+                let rhoIndex = rhoOffset + Int(rho*rhoFraction)
+                if accumulator[thetaIndex][rhoIndex] > 0 {
+                    accumulator[thetaIndex][rhoIndex] -= 1
+                }
+                if rhoIndex - 1 >= 0
+                && accumulator[thetaIndex][rhoIndex - 1] > 0 {
+                    accumulator[thetaIndex][rhoIndex - 1] -= 1
+                }
+                if rhoIndex + 1 < accumulator[thetaIndex].count
+                && accumulator[thetaIndex][rhoIndex + 1] > 0 {
+                    accumulator[thetaIndex][rhoIndex + 1] -= 1
+                }
+            }
+        }
+        // print(accumulator)
 
-        // printEachLine(lineSegments)
         allLineSegments.append(contentsOf: lineSegments)
     }
 
     return allLineSegments
+}
+
+func houghLinesProbabilistic(binaryImage image: [[Bool]],
+                               thetaResolution: Double,
+                                 rhoResolution: Double,
+                                     threshold: Int,
+                                     minLength: Int,
+                                        maxGap: Int) -> [(PointInt, PointInt)] {
+    var image       = image
+    var lines       = [(PointInt, PointInt)]()
+    let shift       = 16
+    let width       = image.count
+    let height      = image[0].count
+    let thetasCount = Int((Double.pi/thetaResolution).rounded())
+    let rhosCount =
+        Int((Double(2*(width + height) + 1)/rhoResolution).rounded())
+    var accumulator = Array(repeating: Array(repeating: 0, count: rhosCount),
+                                count: thetasCount)
+
+    // Compute the sin and cosine of all theta values
+    var trigTable = Array(repeating: 0.0, count: 2*rhosCount)
+    for i in 0..<thetasCount {
+        trigTable[2*i]     = cos(Double(i)*thetaResolution)/rhoResolution
+        trigTable[2*i + 1] = sin(Double(i)*thetaResolution)/rhoResolution
+    }
+
+    // Get the array of pixel locations with value true
+    var nonZeros = [PointInt]()
+    for x in 0..<width {
+        for y in 0..<height {
+            if image[x][y] {
+                nonZeros.append((x, y))
+            }
+        }
+    }
+
+    // Process all points in random order
+    for count in stride(from: nonZeros.count, to: 0, by: -1) {
+        Swift.print(count)
+
+        let index = Int(arc4random_uniform(UInt32(count)))
+        let (x, y) = nonZeros[index]
+        var maxVotesCount = threshold - 1
+        var maxTheta = 0
+        var endPoints = [(0, 0), (0, 0)]
+
+        // Replace the current element with the last element to remove it
+        nonZeros[index] = nonZeros[count - 1]
+
+        // If the point has already been excluded, then it belongs to some other
+        // line
+        if !image[x][y] {
+            continue
+        }
+
+        // Update the accumulator
+        for theta in 0..<thetasCount {
+            let rhoDouble = Double(x)*trigTable[2*theta]
+                          + Double(y)*trigTable[2*theta + 1]
+            let rho = Int(rhoDouble.rounded()) + (rhosCount - 1)/2
+            let votesCount = accumulator[theta][rho] + 1
+            accumulator[theta][rho] = votesCount
+            if maxVotesCount < votesCount {
+                maxVotesCount = votesCount
+                maxTheta = theta
+            }
+        }
+
+        // If the point does not have enough votes, skip it
+        if maxVotesCount < threshold {
+            continue
+        }
+
+        let a = -trigTable[2*maxTheta + 1]  // -sin(theta)
+        let b =  trigTable[2*maxTheta]      //  cos(theta)
+        var x0 = x
+        var y0 = y
+        var dx0: Int
+        var dy0: Int
+        var incrementByX: Bool
+        if abs(a) > abs(b) {
+            incrementByX = true
+            dx0 = a > 0 ? 1 : -1
+            dy0 = Int((b*Double(1 << shift)/abs(a)).rounded())
+            y0 = (y0 << shift) + (1 << (shift - 1))
+        }
+        else {
+            incrementByX = false
+            dx0 = Int((a*Double(1 << shift)/abs(b)).rounded())
+            dy0 = b > 0 ? 1 : -1
+            x0 = (x0 << shift) + (1 << (shift - 1))
+        }
+
+        // Walk along the line in each direction to extract the line segment
+        var dx = dx0
+        var dy = dy0
+        for k in 0..<2 {
+            var gap = 0
+            var x = x0
+            var y = y0
+            while true {
+                var i1: Int
+                var j1: Int
+                if incrementByX {
+                    i1 = x
+                    j1 = y >> shift
+                }
+                else {
+                    i1 = x >> shift
+                    j1 = y
+                }
+                if i1 < 0 || i1 >= width || j1 < 0 || j1 >= height {
+                    break
+                }
+                if image[i1][j1] {
+                    gap = 0
+                    endPoints[k] = (i1, j1)
+                }
+                else if gap + 1 > maxGap {
+                    break
+                }
+                x += dx
+                y += dy
+            }
+
+            // Now walk in the other direction
+            dx = -dx0
+            dy = -dy0
+        }
+
+        let isLineGood = abs(endPoints[0].0 - endPoints[1].0) >= minLength
+                      || abs(endPoints[0].1 - endPoints[1].1) >= minLength
+
+        dx = dx0
+        dy = dy0
+        for k in 0..<2 {
+            var x = x0
+            var y = y0
+            while true {
+                var i1: Int
+                var j1: Int
+                if incrementByX {
+                    i1 = x
+                    j1 = y >> shift
+                }
+                else {
+                    i1 = x >> shift
+                    j1 = y
+                }
+                if image[i1][j1] {
+                    if isLineGood {
+                        for theta in 0..<thetasCount {
+                            let rhoDouble = Double(i1)*trigTable[2*theta]
+                                          + Double(j1)*trigTable[2*theta + 1]
+                            let rho = Int(rhoDouble.rounded())
+                                    + (rhosCount - 1)/2
+                            accumulator[theta][rho] -= 1
+                        }
+                    }
+                    image[i1][j1] = false
+                }
+                if i1 == endPoints[k].0 && j1 == endPoints[k].1 {
+                    break
+                }
+                x += dx
+                y += dy
+            }
+
+            // Now walk in the other direction
+            dx = -dx0
+            dy = -dy0
+        }
+
+        if isLineGood {
+            lines.append((endPoints[0], endPoints[1]))
+        }
+    }
+
+    return lines
 }

@@ -76,16 +76,33 @@ class MainSplitViewController: NSSplitViewController,
         let image: BinaryImage
         do {
             try image = BinaryImage(fileURL: url)
+            let binarizedImage = image.result
             try image.write(appending: " binarized")
             image.thin()
             try image.write(appending: " thinned")
             var diagram = Diagram()
-            diagram.lineSegments = getLineSegments(binaryImage: image.result).map {
-                (p1, p2) in
-                let width  = Double(image.width)
-                let height = Double(image.height)
-                return (PointVector(p1.0/width, (height - p1.1)/width),
-                        PointVector(p2.0/width, (height - p2.1)/width))
+            let width = Double(image.width)
+            let height = image.height
+            // diagram.lineSegments = getLineSegments(
+            //     binaryImage: image.result,
+            //     comparisonImage: binarizedImage
+            // ).map {
+            //     (p1, p2) in
+            //     let width  = Double(image.width)
+            //     let height = Double(image.height)
+            //     return (PointVector(p1.0/width, (height - p1.1)/width),
+            //             PointVector(p2.0/width, (height - p2.1)/width))
+            // }
+            diagram.lineSegments = houghLinesProbabilistic(
+                binaryImage: binarizedImage,
+                thetaResolution: Double.pi/180,
+                rhoResolution: 1,
+                threshold: 40,
+                minLength: 3,
+                maxGap: 10
+            ).map { (p1, p2) in
+                (PointVector(Double(p1.0)/width, Double((height - p1.1))/width),
+                 PointVector(Double(p2.0)/width, Double((height - p2.1))/width))
             }
             main.paper = Rectangle(
                 width: 1,
