@@ -5,7 +5,7 @@
 //  Copyright © 2016-2017 Kijjakarn Praditukrit. All rights reserved.
 //
 
-import Darwin
+import Foundation
 
 /*----------------------------------------------------------------------------
                 Utility Functions Called from View Controllers
@@ -35,11 +35,6 @@ func ^^(base: Double, exponent: Double) -> Double {
     return pow(base, exponent)
 }
 
-// C-style integer division for use in loops
-func /(left: Int, right: Int) -> Int {
-    return Int(floor(Double(left)/Double(right)))
-}
-
 func clearAllPointsAndLines() {
     main.numLines = 0
     main.numPoints = 0
@@ -53,6 +48,7 @@ func clearAllPointsAndLines() {
 
 func makeAllPointsAndLines() {
     clearAllPointsAndLines()
+    let startTime = Date()
 
     // Use paper's corners as point references and edges as line references
     main.allPoints.append(main.paper.corners)
@@ -62,11 +58,13 @@ func makeAllPointsAndLines() {
     var numPoints = 0
     var numLines  = 0
     for rank in 1...main.maxRank {
+        let rankStartTime = Date()
+
         // Variables to store lines and points generated from each axiom
         var newPoints = Set<PointReference>()
         var newLines  = Set<LineReference>()
         for axiom in main.axioms {
-            if main.useAxioms[axiom - 1] {
+            if main.useAxiom(axiom) {
                 switch axiom {
                 case 1: generateAxiom1(rank, &newLines)
                 case 2: generateAxiom2(rank, &newLines)
@@ -81,21 +79,40 @@ func makeAllPointsAndLines() {
         }
         main.allLines.append(newLines)
 
-        // Make intersection points from the new lines
-        for i in 0...(rank/2) {
+        let newPointsQueue = DispatchQueue(label: "newPointsQueue")
+        DispatchQueue.concurrentPerform(iterations: 1 + rank/2) { i in
+            var newPointsLocal = Set<PointReference>()
             let j = rank - i
-            newPoints.formUnion(getIntersections(
-                    main.allLines[i], main.allLines[j], forRank: rank
-                )
-            )
+            for line1 in main.allLines[i] {
+            for line2 in main.allLines[j] {
+                if let point = intersection(angleConstraint: main.minAngle,
+                                            line1.line,
+                                            line2.line),
+                   main.paper.encloses(point: point) {
+                    insert(
+                        uniquePoint: PointReference(line1, line2, point, rank),
+                        into: &newPointsLocal,
+                        forRank: rank
+                    )
+                }
+            }}
+            newPointsQueue.async {
+                newPoints.formUnion(newPointsLocal)
+            }
         }
+
         main.allPoints.append(newPoints)
         numPoints += newPoints.count
         numLines  += newLines.count
         main.numPoints += numPoints
         main.numLines  += numLines
-        print("Rank \(rank): \(numPoints) points, \(numLines) lines")
+        print("Rank \(rank): \(numPoints) points, \(numLines) lines.\n"
+            + "\(newPoints.count) points, \(newLines.count) lines added.\n"
+            + "Time: \(Date().timeIntervalSince(rankStartTime))")
+        print()
     }
+
+    print("Total time: \(Date().timeIntervalSince(startTime))")
 }
 
 // Combine two or more instructions if last one is made by
@@ -305,27 +322,6 @@ func generateAxiom7(_ rank: Int, _ newLines: inout Set<LineReference>) {
             }
         }}}
     }}
-}
-
-// Find the intersections between the lines in `lines1` and `lines2`
-func getIntersections(_ lines1: Set<LineReference>,
-                      _ lines2: Set<LineReference>,
-                forRank rank: Int) -> Set<PointReference> {
-    var points = Set<PointReference>()
-    for line1 in lines1 {
-    for line2 in lines2 {
-        if let point = intersection(angleConstraint: main.minAngle,
-                                    line1.line,
-                                    line2.line),
-           main.paper.encloses(point: point) {
-            insert(
-                uniquePoint: PointReference(line1, line2, point, rank),
-                into: &points,
-                forRank: rank
-            )
-        }
-    }}
-    return points
 }
 
 func insert(uniqueLine line: LineReference,

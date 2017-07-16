@@ -9,7 +9,7 @@ class ReferenceFinder {
     var ε = 1e-8
     var εF: Float = 1e-8
 
-    var maxRank   = 4
+    var maxRank   = 6
     let axioms    = [3, 2, 7, 6, 5, 4, 1]
     var useAxioms = [true, true, true, true, true, true, true]
     var paper     = Rectangle(bottomLeft: PointVector(0, 0),
@@ -31,7 +31,7 @@ class ReferenceFinder {
     var numAngle  = 5000
 
     // Minimum angle in degree between lines to define an intersection
-    var minAngle  = 20.0
+    var minAngle  = 5.0
 
     // Number of points generated so far
     var numPoints = 0
@@ -76,4 +76,8 @@ class ReferenceFinder {
     var detectedLines = [Line]()
 
     private init() {}
+
+    func useAxiom(_ axiom: Int) -> Bool {
+        return useAxioms[axiom - 1]
+    }
 }
