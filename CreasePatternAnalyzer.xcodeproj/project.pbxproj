@@ -31,7 +31,6 @@
 		3A9E16151DE54604004DA53F /* Diagram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9E16141DE54604004DA53F /* Diagram.swift */; };
 		3A9E16171DE548EE004DA53F /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9E16161DE548EE004DA53F /* Arrow.swift */; };
 		3AB46EB81DE66C4000B4A009 /* InstructionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB46EB61DE66C4000B4A009 /* InstructionViewController.swift */; };
-		3AB46EB91DE66C4000B4A009 /* InstructionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AB46EB71DE66C4000B4A009 /* InstructionViewController.xib */; };
 		3AB46EBB1DE6E79D00B4A009 /* IsNotZero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB46EBA1DE6E79D00B4A009 /* IsNotZero.swift */; };
 		3AB598D71DE242C400CA0E31 /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB598D51DE242C400CA0E31 /* ConfigurationViewController.swift */; };
 		3AB598D81DE242C400CA0E31 /* ConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AB598D61DE242C400CA0E31 /* ConfigurationViewController.xib */; };
@@ -85,7 +84,6 @@
 		3A9E16141DE54604004DA53F /* Diagram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Diagram.swift; sourceTree = "<group>"; };
 		3A9E16161DE548EE004DA53F /* Arrow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
 		3AB46EB61DE66C4000B4A009 /* InstructionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstructionViewController.swift; sourceTree = "<group>"; };
-		3AB46EB71DE66C4000B4A009 /* InstructionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InstructionViewController.xib; sourceTree = "<group>"; };
 		3AB46EBA1DE6E79D00B4A009 /* IsNotZero.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsNotZero.swift; sourceTree = "<group>"; };
 		3AB598D51DE242C400CA0E31 /* ConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		3AB598D61DE242C400CA0E31 /* ConfigurationViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConfigurationViewController.xib; sourceTree = "<group>"; };
@@ -148,7 +146,6 @@
 				3AB598D51DE242C400CA0E31 /* ConfigurationViewController.swift */,
 				3AB598D61DE242C400CA0E31 /* ConfigurationViewController.xib */,
 				3AB46EB61DE66C4000B4A009 /* InstructionViewController.swift */,
-				3AB46EB71DE66C4000B4A009 /* InstructionViewController.xib */,
 				3A95FE301E3C10E200C0DEDA /* CGPoint+midpoint.swift */,
 				3A56BC171DE115DD0025021E /* DiagramView.swift */,
 				3A9E16141DE54604004DA53F /* Diagram.swift */,
@@ -302,7 +299,6 @@
 			files = (
 				3A56BC161DE10D030025021E /* PointViewController.xib in Resources */,
 				3A3276BC1DE0173E0076B8DC /* Assets.xcassets in Resources */,
-				3AB46EB91DE66C4000B4A009 /* InstructionViewController.xib in Resources */,
 				3AB598D81DE242C400CA0E31 /* ConfigurationViewController.xib in Resources */,
 				3A3276BF1DE0173E0076B8DC /* Main.storyboard in Resources */,
 			);

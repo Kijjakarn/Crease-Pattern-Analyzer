@@ -13,8 +13,8 @@ protocol InstructionViewControllerDelegate: class {
 }
 
 class InstructionViewController: NSViewController {
-    override var nibName: String? {
-        return "InstructionViewController"
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
     }
 
     dynamic weak var delegate: InstructionViewControllerDelegate!
@@ -48,10 +48,8 @@ class InstructionViewController: NSViewController {
         }
     }
 
-    @IBOutlet weak var diagramView:    DiagramView!
-    @IBOutlet weak var instruction:    NSTextView!
-    @IBOutlet weak var nextButton:     NSButton!
-    @IBOutlet weak var previousButton: NSButton!
+    var diagramView: DiagramView!
+    var instruction: NSTextView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,17 +61,93 @@ class InstructionViewController: NSViewController {
             name: NSNotification.Name("FindPoint"),
             object: nil
         )
-        diagramView.delegate = parent as! DiagramViewDelegate
-        instruction.font = NSFont.systemFont(ofSize: 14)
+
+        setUpView()
     }
 
-    @IBAction
-    func showPrevious(_ sender: NSButton) {
+    func setUpView() {
+        diagramView = DiagramView()
+        diagramView.delegate = parent as! DiagramViewDelegate
+        instruction = NSTextView()
+        instruction.font = NSFont.systemFont(ofSize: 13)
+        instruction.isEditable = false
+        let scrollView = NSScrollView()
+        scrollView.documentView = instruction
+
+        let previousButton = NSButton(
+            title: "Previous",
+            target: self,
+            action: #selector(InstructionViewController.showPrevious)
+        )
+        previousButton.bind(
+            "enabled",
+            to: self,
+            withKeyPath: "enablePreviousButton",
+            options: nil
+        )
+        previousButton.bind(
+            "enabled2",
+            to: self,
+            withKeyPath: "delegate.hasFinishedInitialization",
+            options: nil
+        )
+
+        let nextButton = NSButton(
+            title: "Next",
+            target: self,
+            action: #selector(InstructionViewController.showNext)
+        )
+        nextButton.bind(
+            "enabled",
+            to: self,
+            withKeyPath: "enableNextButton",
+            options: nil
+        )
+        nextButton.bind(
+            "enabled2",
+            to: self,
+            withKeyPath: "delegate.hasFinishedInitialization",
+            options: nil
+        )
+
+        let buttonsContainer = NSStackView(
+            views: [previousButton, nextButton]
+        )
+        let stackView = NSStackView(
+            views: [diagramView, buttonsContainer, scrollView]
+        )
+        view.addSubview(stackView)
+
+        stackView.translatesAutoresizingMaskIntoConstraints        = false
+        buttonsContainer.translatesAutoresizingMaskIntoConstraints = false
+        previousButton.translatesAutoresizingMaskIntoConstraints   = false
+        nextButton.translatesAutoresizingMaskIntoConstraints       = false
+        scrollView.translatesAutoresizingMaskIntoConstraints       = false
+        instruction.autoresizingMask = .viewWidthSizable
+
+        stackView.orientation = .vertical
+        stackView.alignment = .left
+
+        NSLayoutConstraint.activate([
+            stackView.leftAnchor
+                     .constraint(equalTo: view.leftAnchor, constant: 20),
+            stackView.rightAnchor
+                     .constraint(equalTo: view.rightAnchor, constant: -20),
+            stackView.topAnchor
+                     .constraint(equalTo: view.topAnchor, constant: 20),
+            stackView.bottomAnchor
+                     .constraint(equalTo: view.bottomAnchor, constant: -20),
+        ])
+
+        scrollView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        scrollView.borderType = .noBorder
+    }
+
+    func showPrevious() {
         viewNumber -= 1
     }
 
-    @IBAction
-    func showNext(_ sender: NSButton) {
+    func showNext() {
         viewNumber += 1
     }
 
