@@ -23,7 +23,6 @@
 		3A56BC111DE10C410025021E /* ReferenceFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC061DE10C410025021E /* ReferenceFinder.swift */; };
 		3A56BC121DE10C410025021E /* References.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC071DE10C410025021E /* References.swift */; };
 		3A56BC141DE10C410025021E /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC091DE10C410025021E /* utils.swift */; };
-		3A56BC161DE10D030025021E /* PointViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A56BC151DE10D030025021E /* PointViewController.xib */; };
 		3A56BC181DE115DD0025021E /* DiagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC171DE115DD0025021E /* DiagramView.swift */; };
 		3A56BC1A1DE157560025021E /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC191DE157560025021E /* MainSplitViewController.swift */; };
 		3A95FE311E3C10E200C0DEDA /* CGPoint+midpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A95FE301E3C10E200C0DEDA /* CGPoint+midpoint.swift */; };
@@ -75,7 +74,6 @@
 		3A56BC061DE10C410025021E /* ReferenceFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferenceFinder.swift; sourceTree = "<group>"; };
 		3A56BC071DE10C410025021E /* References.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = References.swift; sourceTree = "<group>"; };
 		3A56BC091DE10C410025021E /* utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
-		3A56BC151DE10D030025021E /* PointViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PointViewController.xib; sourceTree = "<group>"; };
 		3A56BC171DE115DD0025021E /* DiagramView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiagramView.swift; sourceTree = "<group>"; };
 		3A56BC191DE157560025021E /* MainSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSplitViewController.swift; sourceTree = "<group>"; };
 		3A95FE301E3C10E200C0DEDA /* CGPoint+midpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPoint+midpoint.swift"; sourceTree = "<group>"; };
@@ -140,7 +138,6 @@
 				3A56BC011DE10C410025021E /* MainWindowController.swift */,
 				3A56BC191DE157560025021E /* MainSplitViewController.swift */,
 				3A56BC031DE10C410025021E /* PointViewController.swift */,
-				3A56BC151DE10D030025021E /* PointViewController.xib */,
 				3AB598D51DE242C400CA0E31 /* ConfigurationViewController.swift */,
 				3AB46EB61DE66C4000B4A009 /* InstructionViewController.swift */,
 				3A95FE301E3C10E200C0DEDA /* CGPoint+midpoint.swift */,
@@ -294,7 +291,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3A56BC161DE10D030025021E /* PointViewController.xib in Resources */,
 				3A3276BC1DE0173E0076B8DC /* Assets.xcassets in Resources */,
 				3A3276BF1DE0173E0076B8DC /* Main.storyboard in Resources */,
 			);

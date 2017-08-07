@@ -132,7 +132,6 @@ class MainSplitViewController: NSSplitViewController,
 
     func reinitialize() {
         // Remove all found points in table
-        pointVC.arrayController.content = nil
         pointVC.foundPoints.removeAll()
 
         // Update paper
