@@ -13,10 +13,6 @@ protocol InstructionViewControllerDelegate: class {
 }
 
 class InstructionViewController: NSViewController {
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
     dynamic weak var delegate: InstructionViewControllerDelegate!
 
     dynamic var enableNextButton = false
@@ -51,6 +47,10 @@ class InstructionViewController: NSViewController {
     var diagramView: DiagramView!
     var instruction: NSTextView!
 
+    override func loadView() {
+        view = NSView()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -66,8 +66,6 @@ class InstructionViewController: NSViewController {
     }
 
     func setUpView() {
-        diagramView = DiagramView()
-        diagramView.delegate = parent as! DiagramViewDelegate
         instruction = NSTextView()
         instruction.font = NSFont.systemFont(ofSize: 13)
         instruction.isEditable = false

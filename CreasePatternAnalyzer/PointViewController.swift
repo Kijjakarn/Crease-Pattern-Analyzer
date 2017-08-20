@@ -48,6 +48,10 @@ class PointViewController: NSViewController, NSTableViewDelegate {
     var errorMessage:    NSTextField!
     var arrayController: NSArrayController!
 
+    override func loadView() {
+        view = NSView()
+    }
+
     func updateX(_ sender: NSTextField) {
         let parsedX = Parser.parsedString(from: sender.stringValue)
         if parsedX.success {

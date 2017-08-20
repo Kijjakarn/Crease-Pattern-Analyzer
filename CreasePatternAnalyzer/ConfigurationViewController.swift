@@ -63,8 +63,8 @@ class ConfigurationViewController: NSViewController,
     dynamic var isHeightValid = true
     dynamic var isEditing     = false
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
+    override func loadView() {
+        view = NSView()
     }
 
     func control(_ control: NSControl, textShouldEndEditing fieldEditor: NSText)

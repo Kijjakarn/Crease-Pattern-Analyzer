@@ -20,15 +20,6 @@ class MainWindowController: NSWindowController {
 
     dynamic weak var delegate: MainWindowControllerDelegate!
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
-        window!.title = "Crease Pattern Analyzer"
-        delegate = contentViewController as! MainWindowControllerDelegate
-        appDelegate.initializationQueue.addOperation {
-            makeAllPointsAndLines()
-        }
-    }
-
     @IBAction func openImage(_ sender: NSMenuItem) {
         let openPanel = NSOpenPanel()
         openPanel.canChooseFiles = true

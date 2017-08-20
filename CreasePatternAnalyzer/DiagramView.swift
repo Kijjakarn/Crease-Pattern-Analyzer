@@ -9,9 +9,11 @@
 import Cocoa
 
 protocol DiagramViewDelegate: class {
-    func update(beginPoint: PointVector)
-    func update(draggedPoint: PointVector)
-    func update(endPoint: PointVector)
+    var inputPoint: PointVector { get }
+
+    func diagramView(_: DiagramView, didUpdateBeginPoint: PointVector)
+    func diagramView(_: DiagramView, didUpdateDraggedPoint: PointVector)
+    func diagramView(_: DiagramView, didUpdateEndPoint: PointVector)
 }
 
 class DiagramView: NSView {
@@ -219,28 +221,23 @@ class DiagramView: NSView {
     }
 
     func drawSelectedPoint() {
-        if let pointVC = (delegate as! MainSplitViewController).pointVC {
-            let pointReference = PointReference(PointVector(pointVC.x,
-                                                            pointVC.y))
-
-            let point = viewPoint(from: pointReference.point)
-            let origin = CGPoint(
-                x: point.x - CGFloat(pointRadius),
-                y: point.y - CGFloat(pointRadius)
-            )
-            let dot = CGMutablePath()
-            dot.addEllipse(in: CGRect(
-                origin: origin,
-                size: CGSize(width: 2*pointRadius, height: 2*pointRadius)
-            ))
-            selectedPointLayer.path = dot
-            selectedPointLayer.bounds = bounds
-            selectedPointLayer.position = CGPoint(x: bounds.midX,
-                                                  y: bounds.midY)
-            selectedPointLayer.lineWidth = CGFloat(pointRadius)/2
-            selectedPointLayer.fillColor = nil
-            selectedPointLayer.strokeColor = NSColor.blue.cgColor
-        }
+        let point = viewPoint(from: delegate.inputPoint)
+        let origin = CGPoint(
+            x: CGFloat(point.x) - CGFloat(pointRadius),
+            y: CGFloat(point.y) - CGFloat(pointRadius)
+        )
+        let dot = CGMutablePath()
+        dot.addEllipse(in: CGRect(
+            origin: origin,
+            size: CGSize(width: 2*pointRadius, height: 2*pointRadius)
+        ))
+        selectedPointLayer.path = dot
+        selectedPointLayer.bounds = bounds
+        selectedPointLayer.position = CGPoint(x: bounds.midX,
+                                              y: bounds.midY)
+        selectedPointLayer.lineWidth = CGFloat(pointRadius)/2
+        selectedPointLayer.fillColor = nil
+        selectedPointLayer.strokeColor = NSColor.blue.cgColor
     }
 
     func viewPoint(from point: PointVector) -> CGPoint {
@@ -482,7 +479,7 @@ class DiagramView: NSView {
         var viewPoint = convert(event.locationInWindow, from: nil)
         convert(viewPoint: &viewPoint)
         let selectedPoint = paperPoint(from: viewPoint)
-        delegate.update(beginPoint: selectedPoint)
+        delegate.diagramView(self, didUpdateBeginPoint: selectedPoint);
         drawSelectedPoint()
     }
 
@@ -493,7 +490,7 @@ class DiagramView: NSView {
             Double(viewPoint.x - paperBottomLeft.x)/scale,
             Double(viewPoint.y - paperBottomLeft.y)/scale
         )
-        delegate.update(draggedPoint: selectedPoint)
+        delegate.diagramView(self, didUpdateDraggedPoint: selectedPoint)
         drawSelectedPoint()
     }
 }

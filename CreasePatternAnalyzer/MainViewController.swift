@@ -1,5 +1,5 @@
 //
-//  MainSplitViewController.swift
+//  MainViewController.swift
 //  CreasePatternAnalyzer
 //
 //  Created by Kijjakarn Praditukrit on 11/19/16.
@@ -8,12 +8,12 @@
 
 import Cocoa
 
-class MainSplitViewController: NSSplitViewController,
-                               MainWindowControllerDelegate,
-                               PointViewControllerDelegate,
-                               ConfigurationViewControllerDelegate,
-                               InstructionViewControllerDelegate,
-                               DiagramViewDelegate
+class MainViewController: NSViewController,
+                          MainWindowControllerDelegate,
+                          PointViewControllerDelegate,
+                          ConfigurationViewControllerDelegate,
+                          InstructionViewControllerDelegate,
+                          DiagramViewDelegate
 {
 
     var tabVC:           NSTabViewController!
@@ -31,20 +31,71 @@ class MainSplitViewController: NSSplitViewController,
 
     var buttons: [NSButton]!
 
+    override func loadView() {
+        view = NSView()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let leftPanelVC = childViewControllers[0]
-            as! NSSplitViewController
-        tabVC = leftPanelVC.childViewControllers[0]
-            as! NSTabViewController
-        pointVC = tabVC.childViewControllers[0]
-            as! PointViewController
-        configurationVC = leftPanelVC.childViewControllers[1]
-            as! ConfigurationViewController
-        instructionVC = childViewControllers[1]
-            as! InstructionViewController
-        diagramView = instructionVC.diagramView
+        tabVC           = NSTabViewController()
+        pointVC         = PointViewController()
+        configurationVC = ConfigurationViewController()
+        instructionVC   = InstructionViewController()
+
+        diagramView = DiagramView()
+        diagramView.delegate = self
+        instructionVC.diagramView = diagramView
+
+        let tabView           = tabVC.view
+        let pointView         = pointVC.view
+        let configurationView = configurationVC.view
+        let instructionView   = instructionVC.view
+
+        let pointVCItem = NSTabViewItem(identifier: "PointViewController")
+        pointVCItem.label = "Point"
+        pointVCItem.viewController = pointVC
+        tabVC.addTabViewItem(pointVCItem)
+
+        let leftPanelView = NSStackView(views: [tabView, configurationView])
+        leftPanelView.orientation = .vertical
+        leftPanelView.distribution = .fillEqually
+        leftPanelView.alignment = .left
+        view.addSubview(leftPanelView)
+        view.addSubview(instructionView)
+
+        leftPanelView.translatesAutoresizingMaskIntoConstraints     = false
+        tabView.translatesAutoresizingMaskIntoConstraints           = false
+        configurationView.translatesAutoresizingMaskIntoConstraints = false
+        instructionView.translatesAutoresizingMaskIntoConstraints   = false
+        view.translatesAutoresizingMaskIntoConstraints              = false
+
+        leftPanelView.rightAnchor
+                     .constraint(equalTo: instructionView.leftAnchor)
+                     .isActive = true;
+
+        tabView.widthAnchor
+               .constraint(equalTo: configurationView.widthAnchor)
+               .isActive = true;
+
+        NSLayoutConstraint.activate([
+            view.topAnchor
+                .constraint(equalTo: tabView.topAnchor),
+            view.topAnchor
+                .constraint(equalTo: instructionView.topAnchor),
+            view.bottomAnchor
+                .constraint(equalTo: configurationView.bottomAnchor),
+            view.bottomAnchor
+                .constraint(equalTo: instructionView.bottomAnchor),
+            view.leftAnchor
+                .constraint(equalTo: leftPanelView.leftAnchor),
+            view.rightAnchor
+                .constraint(equalTo: instructionView.rightAnchor),
+            view.widthAnchor
+                .constraint(greaterThanOrEqualToConstant: 1000),
+            view.heightAnchor
+                .constraint(greaterThanOrEqualToConstant: 700),
+        ])
 
         // Set the delegates
         pointVC.delegate         = self
@@ -148,32 +199,36 @@ class MainSplitViewController: NSSplitViewController,
         }
     }
 
-    // MARK: - DiagramViewDelegate
+    // MARK: DiagramViewDelegate
 
-    func update(beginPoint: PointVector) {
+    var inputPoint: PointVector {
+        return PointVector(pointVC.x, pointVC.y)
+    }
+
+    func diagramView(_: DiagramView, didUpdateBeginPoint point: PointVector) {
         if let currentVC = tabVC.tabView.selectedTabViewItem?.viewController,
            currentVC is PointViewController {
-            updatePoint(withPoint: beginPoint)
+            updatePoint(withPoint: point)
         }
         else {
             // TODO
         }
     }
 
-    func update(endPoint: PointVector) {
+    func diagramView(_: DiagramView, didUpdateDraggedPoint point: PointVector) {
         if let currentVC = tabVC.tabView.selectedTabViewItem?.viewController,
            currentVC is PointViewController {
-            updatePoint(withPoint: endPoint)
+            updatePoint(withPoint: point)
         }
         else {
             // TODO
         }
     }
 
-    func update(draggedPoint: PointVector) {
+    func diagramView(_: DiagramView, didUpdateEndPoint point: PointVector) {
         if let currentVC = tabVC.tabView.selectedTabViewItem?.viewController,
            currentVC is PointViewController {
-            updatePoint(withPoint: draggedPoint)
+            updatePoint(withPoint: point)
         }
         else {
             // TODO
