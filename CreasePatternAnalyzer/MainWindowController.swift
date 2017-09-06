@@ -19,26 +19,4 @@ class MainWindowController: NSWindowController {
     let appDelegate = NSApplication.shared().delegate as! AppDelegate
 
     dynamic weak var delegate: MainWindowControllerDelegate!
-
-    @IBAction func openImage(_ sender: NSMenuItem) {
-        let openPanel = NSOpenPanel()
-        openPanel.canChooseFiles = true
-        openPanel.canChooseDirectories = false
-        openPanel.allowsMultipleSelection = false
-        openPanel.allowedFileTypes = ["jpg", "jpeg", "png", "bmp"]
-        openPanel.beginSheetModal(for: window!) {
-            switch $0 {
-            case NSFileHandlingPanelOKButton:
-                if openPanel.urls.count == 0 {
-                    break
-                }
-                let fileURL = openPanel.urls[0]
-                OperationQueue().addOperation {
-                    self.delegate.processImage(url: fileURL)
-                }
-            default:
-                break
-            }
-        }
-    }
 }
