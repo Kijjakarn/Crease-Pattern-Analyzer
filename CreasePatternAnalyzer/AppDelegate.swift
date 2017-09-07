@@ -12,7 +12,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let applicationName = Bundle.main.infoDictionary?["CFBundleName"] as! String
     var initializationQueue = OperationQueue()
 
-    var mainWindowController: MainWindowController!
+    var mainViewController:   MainViewController!
+    var mainWindowController: NSWindowController!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let window = NSWindow(
@@ -21,11 +22,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .retained,
             defer: false
         )
-        let mainWindowController = MainWindowController(window: window)
+        let mainWindowController = NSWindowController(window: window)
         window.title = applicationName
-        let mainViewController = MainViewController()
+        mainViewController = MainViewController()
         mainWindowController.contentViewController = mainViewController
-        mainWindowController.delegate = mainViewController
         mainWindowController.showWindow(self)
         self.mainWindowController = mainWindowController
         initializationQueue.addOperation {
@@ -81,7 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
                 let fileURL = openPanel.urls[0]
                 OperationQueue().addOperation {
-                    self.mainWindowController.delegate.processImage(url: fileURL)
+                    self.mainViewController.processImage(url: fileURL)
                 }
             default:
                 break

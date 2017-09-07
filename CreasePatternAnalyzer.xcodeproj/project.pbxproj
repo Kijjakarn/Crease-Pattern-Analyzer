@@ -14,7 +14,6 @@
 		3A3276D51DE0173E0076B8DC /* CreasePatternAnalyzerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3276D41DE0173E0076B8DC /* CreasePatternAnalyzerUITests.swift */; };
 		3A56BC0A1DE10C410025021E /* Axioms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BBFF1DE10C410025021E /* Axioms.swift */; };
 		3A56BC0B1DE10C410025021E /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC001DE10C410025021E /* Line.swift */; };
-		3A56BC0C1DE10C410025021E /* MainWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC011DE10C410025021E /* MainWindowController.swift */; };
 		3A56BC0D1DE10C410025021E /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC021DE10C410025021E /* Parser.swift */; };
 		3A56BC0E1DE10C410025021E /* PointViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC031DE10C410025021E /* PointViewController.swift */; };
 		3A56BC0F1DE10C410025021E /* PointVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A56BC041DE10C410025021E /* PointVector.swift */; };
@@ -65,7 +64,6 @@
 		3A3276D61DE0173E0076B8DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3A56BBFF1DE10C410025021E /* Axioms.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Axioms.swift; sourceTree = "<group>"; };
 		3A56BC001DE10C410025021E /* Line.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
-		3A56BC011DE10C410025021E /* MainWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowController.swift; sourceTree = "<group>"; };
 		3A56BC021DE10C410025021E /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		3A56BC031DE10C410025021E /* PointViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PointViewController.swift; sourceTree = "<group>"; };
 		3A56BC041DE10C410025021E /* PointVector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PointVector.swift; sourceTree = "<group>"; };
@@ -135,7 +133,6 @@
 			children = (
 				3ACBB0D11F39B58300D4139B /* main.swift */,
 				3A3276B71DE0173E0076B8DC /* AppDelegate.swift */,
-				3A56BC011DE10C410025021E /* MainWindowController.swift */,
 				3A56BC191DE157560025021E /* MainViewController.swift */,
 				3A56BC031DE10C410025021E /* PointViewController.swift */,
 				3AB598D51DE242C400CA0E31 /* ConfigurationViewController.swift */,
@@ -332,7 +329,6 @@
 				3A95FE331E3C421100C0DEDA /* Array+minIndex.swift in Sources */,
 				3A9E16151DE54604004DA53F /* Diagram.swift in Sources */,
 				3A56BC181DE115DD0025021E /* DiagramView.swift in Sources */,
-				3A56BC0C1DE10C410025021E /* MainWindowController.swift in Sources */,
 				3A56BC111DE10C410025021E /* ReferenceFinder.swift in Sources */,
 				3ACBB0D21F39B58300D4139B /* main.swift in Sources */,
 				3AB46EBB1DE6E79D00B4A009 /* IsNotZero.swift in Sources */,

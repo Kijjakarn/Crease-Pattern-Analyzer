@@ -8,8 +8,9 @@
 
 import Cocoa
 
+var main = ReferenceFinder.singleton
+
 class MainViewController: NSViewController,
-                          MainWindowControllerDelegate,
                           PointViewControllerDelegate,
                           ConfigurationViewControllerDelegate,
                           InstructionViewControllerDelegate,
