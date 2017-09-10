@@ -32,6 +32,13 @@ class DiagramView: NSView {
     var arrowsLayer        = CALayer()
     var selectedPointLayer = CAShapeLayer()
 
+    // Map each hit target to the original line
+    var linesHitTargets = [(CGPath, (PointVector, PointVector))]()
+
+    var linesUnderCursorLayer = CALayer()
+    var candidatePointLayer   = CAShapeLayer()
+    var candidatePoint: PointVector?
+
     var pointRadius: Double = 0
     var dashLength:  Double = 0
     var spaceLength: Double = 0
@@ -100,6 +107,8 @@ class DiagramView: NSView {
         layer!.addSublayer(pointLabelsLayer)
         layer!.addSublayer(arrowsLayer)
         layer!.addSublayer(selectedPointLayer)
+        layer!.addSublayer(linesUnderCursorLayer)
+        layer!.addSublayer(candidatePointLayer)
         paperBoundsLayer.actions = [
             "position": NSNull(),
             "bounds": NSNull(),
@@ -110,10 +119,11 @@ class DiagramView: NSView {
         pointsLayer.actions      = sublayersNullAction
         pointLabelsLayer.actions = sublayersNullAction
         arrowsLayer.actions      = sublayersNullAction
+        linesUnderCursorLayer.actions = sublayersNullAction
+        candidatePointLayer.actions   = sublayersNullAction
         wantsLayer = true
     }
 
-    // override func draw(_ dirtyRect: CGRect) {
     func drawAll() {
         drawPaperBounds()
         arrowsLayer.sublayers?.removeAll()
@@ -138,9 +148,26 @@ class DiagramView: NSView {
         if let fold = diagram.fold {
             draw(line: fold, type: .fold)
         }
+        linesHitTargets.removeAll(keepingCapacity: true)
         for (p1, p2) in diagram.lineSegments {
             draw(from: p1, to: p2)
         }
+    }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+
+        // Configure mouse tracking area
+        for trackingArea in trackingAreas {
+            removeTrackingArea(trackingArea)
+        }
+        let trackingArea = NSTrackingArea(
+            rect: bounds,
+            options: [.activeInKeyWindow, .mouseMoved],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(trackingArea)
     }
 
     @objc func updatePaddingAndDrawAll(_ note: Notification) {
@@ -220,8 +247,9 @@ class DiagramView: NSView {
         }
     }
 
-    func drawSelectedPoint() {
-        let point = viewPoint(from: delegate.inputPoint)
+    func drawSelection(
+      point: PointVector, in layer: CAShapeLayer, color: CGColor) {
+        let point = viewPoint(from: point)
         let origin = CGPoint(
             x: CGFloat(point.x) - CGFloat(pointRadius),
             y: CGFloat(point.y) - CGFloat(pointRadius)
@@ -231,13 +259,18 @@ class DiagramView: NSView {
             origin: origin,
             size: CGSize(width: 2*pointRadius, height: 2*pointRadius)
         ))
-        selectedPointLayer.path = dot
-        selectedPointLayer.bounds = bounds
-        selectedPointLayer.position = CGPoint(x: bounds.midX,
-                                              y: bounds.midY)
-        selectedPointLayer.lineWidth = CGFloat(pointRadius)/2
-        selectedPointLayer.fillColor = nil
-        selectedPointLayer.strokeColor = NSColor.blue.cgColor
+        layer.path        = dot
+        layer.bounds      = bounds
+        layer.position    = CGPoint(x: bounds.midX, y: bounds.midY)
+        layer.lineWidth   = CGFloat(pointRadius)/2
+        layer.fillColor   = nil
+        layer.strokeColor = color
+    }
+
+    func drawSelectedPoint() {
+        drawSelection(point: delegate.inputPoint,
+                         in: selectedPointLayer,
+                      color: NSColor.blue.cgColor)
     }
 
     func viewPoint(from point: PointVector) -> CGPoint {
@@ -362,7 +395,6 @@ class DiagramView: NSView {
     }
 
     func draw(from p1: PointVector, to p2: PointVector) {
-        // print("Drawing line connecting points \(p1) \(p2)")
         let line = CGMutablePath()
         line.move(to: viewPoint(from: p1))
         line.addLine(to: viewPoint(from: p2))
@@ -371,6 +403,9 @@ class DiagramView: NSView {
         lineLayer.path = line
         lineLayer.bounds = bounds
         lineLayer.position = CGPoint(x: bounds.midX, y: bounds.midY)
+
+        // Create hit targets
+        linesHitTargets.append((line.hitTarget, (p1, p2)))
 
         // Draw solid black line
         lineLayer.strokeColor = CGColor.black
@@ -476,9 +511,15 @@ class DiagramView: NSView {
     // Mark: - Specify point or line on the paper
 
     override func mouseDown(with event: NSEvent) {
-        var viewPoint = convert(event.locationInWindow, from: nil)
-        convert(viewPoint: &viewPoint)
-        let selectedPoint = paperPoint(from: viewPoint)
+        var selectedPoint: PointVector
+        if let candidatePoint = candidatePoint {
+            selectedPoint = candidatePoint
+        }
+        else {
+            var viewPoint = convert(event.locationInWindow, from: nil)
+            convert(viewPoint: &viewPoint)
+            selectedPoint = paperPoint(from: viewPoint)
+        }
         delegate.diagramView(self, didUpdateBeginPoint: selectedPoint);
         drawSelectedPoint()
     }
@@ -492,5 +533,52 @@ class DiagramView: NSView {
         )
         delegate.diagramView(self, didUpdateDraggedPoint: selectedPoint)
         drawSelectedPoint()
+    }
+
+    // Mark: - Select a line
+
+    override func mouseMoved(with event: NSEvent) {
+        let viewPoint = convert(event.locationInWindow, from: nil)
+        candidatePoint = nil
+        linesUnderCursorLayer.sublayers = []
+        candidatePointLayer.path = CGMutablePath()
+
+        var targets = [CGPath]()
+        var lines   = [(PointVector, PointVector)]()
+        for (target, line) in linesHitTargets {
+            if target.contains(viewPoint, using: .evenOdd) {
+                targets.append(target)
+                lines.append(line)
+            }
+        }
+
+        // Highlight the lines under the cursor
+        for target in targets {
+            let lineUnderCursorLayer = CAShapeLayer()
+            lineUnderCursorLayer.path = target
+            lineUnderCursorLayer.fillColor = NSColor.red.cgColor
+            lineUnderCursorLayer.bounds = bounds
+            lineUnderCursorLayer.position = CGPoint(x: bounds.midX,
+                                                    y: bounds.midY)
+            linesUnderCursorLayer.addSublayer(lineUnderCursorLayer)
+        }
+
+        // Find an intersection point among the lines under the cursor
+        for i in 0..<targets.count {
+            for j in (i + 1)..<targets.count {
+                let (a1, a2) = lines[i]
+                let (b1, b2) = lines[j]
+                let lineA = Line(a1, a2)
+                let lineB = Line(b1, b2)
+                if let intersection = intersection(lineA, lineB),
+                   lineA.contains(point: intersection) {
+                    drawSelection(point: intersection,
+                                     in: candidatePointLayer,
+                                  color: NSColor.green.cgColor)
+                    candidatePoint = intersection
+                    return
+                }
+            }
+        }
     }
 }
