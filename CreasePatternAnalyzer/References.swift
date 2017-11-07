@@ -16,22 +16,22 @@ class PointReference: NSObject, Reference {
     let firstLine:  LineReference!
     let secondLine: LineReference!
 
-    var pointString: String {
+    @objc var pointString: String {
         return point.description
     }
 
-    var rank = 0
+    @objc var rank = 0
 
-    var distanceError = Double.greatestFiniteMagnitude
+    @objc var distanceError = Double.greatestFiniteMagnitude
 
     var label: String = "_"
 
     func isNotCorner() -> Bool {
-        return label.characters.count == 1
+        return label.count == 1
     }
 
     override var description: String {
-        if label.characters.count == 1 {
+        if label.count == 1 {
             return "point \(label)"
         }
         return label
@@ -76,15 +76,15 @@ class LineReference: NSObject, Reference {
     let line:  Line
     let axiom: Axiom?
 
-    var rank = 0
+    @objc var rank = 0
 
-    var shiftError = Double.greatestFiniteMagnitude
-    var angleError = Double.greatestFiniteMagnitude
+    @objc var shiftError = Double.greatestFiniteMagnitude
+    @objc var angleError = Double.greatestFiniteMagnitude
 
     var label: String = "_"
 
     func isNotEdge() -> Bool {
-        return label.characters.count <= 1
+        return label.count <= 1
     }
 
     override var hashValue: Int {
@@ -92,7 +92,7 @@ class LineReference: NSObject, Reference {
     }
 
     override var description: String {
-        if label.characters.count == 1 {
+        if label.count == 1 {
             return "line \(label)"
         }
         return label

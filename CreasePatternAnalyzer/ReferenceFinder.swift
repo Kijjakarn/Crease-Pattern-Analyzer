@@ -15,8 +15,8 @@ class ReferenceFinder {
     var paper     = Rectangle(bottomLeft: PointVector(0, 0),
                                 topRight: PointVector(1, 1))
 
-    let pointLabels = Array("LKJIHGFEDCBA".characters)
-    let lineLabels  = Array("ZYXWVUTSRQPO".characters)
+    let pointLabels = Array("LKJIHGFEDCBA")
+    let lineLabels  = Array("ZYXWVUTSRQPO")
 
     // Number of horizontal partitions
     var numX = 5000

@@ -25,10 +25,10 @@ class MainViewController: NSViewController,
     var instructionVC:   InstructionViewController!
     var diagramView:     DiagramView!
 
-    dynamic var hasFinishedInitialization = false
+    @objc dynamic var hasFinishedInitialization = false
 
     let initializationQueue =
-        (NSApplication.shared().delegate as! AppDelegate).initializationQueue
+        (NSApplication.shared.delegate as! AppDelegate).initializationQueue
 
     var buttons: [NSButton]!
 

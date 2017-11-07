@@ -51,14 +51,14 @@ class BinaryImage {
         let outputNSImage  = NSImage(cgImage: outputCGImage!, size: NSSize())
         let outputTIFFData = outputNSImage.tiffRepresentation!
         let outputImageRep = NSBitmapImageRep(data: outputTIFFData)
-        let fileType: NSBitmapImageFileType
+        let fileType: NSBitmapImageRep.FileType
 
         switch (name as NSString).pathExtension {
-        case "png" :  fileType = NSPNGFileType
-        case "jpg" :  fileType = NSJPEGFileType
-        case "jpeg":  fileType = NSJPEGFileType
-        case "gif" :  fileType = NSGIFFileType
-        case "bmp" :  fileType = NSBMPFileType
+        case "png" :  fileType = .png
+        case "jpg" :  fileType = .jpeg
+        case "jpeg":  fileType = .jpeg
+        case "gif" :  fileType = .gif
+        case "bmp" :  fileType = .bmp
         default    :     throw ImageProcessingError.unsupportedFileType
         }
 

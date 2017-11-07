@@ -25,23 +25,23 @@ class TextField: NSTextField {
 class ConfigurationViewController: NSViewController,
                                    NSControlTextEditingDelegate,
                                    NSTextFieldDelegate {
-    dynamic weak var delegate: ConfigurationViewControllerDelegate!
+    @objc dynamic weak var delegate: ConfigurationViewControllerDelegate!
 
-    dynamic var width: Double = 1 {
+    @objc dynamic var width: Double = 1 {
         didSet {
             widthInput.stringValue = String(width)
             isWidthValid  = true
         }
     }
 
-    dynamic var height: Double = 1 {
+    @objc dynamic var height: Double = 1 {
         didSet {
             heightInput.stringValue = String(height)
             isHeightValid = true
         }
     }
 
-    dynamic var useSquare = true {
+    @objc dynamic var useSquare = true {
         didSet {
             if useSquare {
                 width  = 1
@@ -52,16 +52,16 @@ class ConfigurationViewController: NSViewController,
     }
 
     let initializationQueue =
-        (NSApplication.shared().delegate as! AppDelegate).initializationQueue
+        (NSApplication.shared.delegate as! AppDelegate).initializationQueue
 
     var widthInput:   TextField!
     var heightInput:  TextField!
     var errorMessage: NSTextField!
 
     // Variables for enabling/disabling the reinitialize button
-    dynamic var isWidthValid  = true
-    dynamic var isHeightValid = true
-    dynamic var isEditing     = false
+    @objc dynamic var isWidthValid  = true
+    @objc dynamic var isHeightValid = true
+    @objc dynamic var isEditing     = false
 
     override func loadView() {
         view = NSView()
@@ -81,7 +81,7 @@ class ConfigurationViewController: NSViewController,
         return true
     }
 
-    func updateWidth() {
+    @objc func updateWidth() {
         let parsedWidth = Parser.parsedString(from: widthInput.stringValue)
         isEditing = false
         if parsedWidth.success {
@@ -100,7 +100,7 @@ class ConfigurationViewController: NSViewController,
         }
     }
 
-    func updateHeight() {
+    @objc func updateHeight() {
         let parsedHeight = Parser.parsedString(from: heightInput.stringValue)
         isEditing = false
         if parsedHeight.success {
@@ -119,16 +119,16 @@ class ConfigurationViewController: NSViewController,
         }
     }
 
-    func setMaxRank(_ sender: NSPopUpButton) {
+    @objc func setMaxRank(_ sender: NSPopUpButton) {
         main.maxRank = sender.indexOfSelectedItem + 1
     }
 
-    func reinitialize() {
+    @objc func reinitialize() {
         delegate.reinitialize()
     }
 
-    func toggleAxiom(_ sender: NSButton) {
-        main.useAxioms[sender.tag - 1] = sender.state == 0 ? false : true
+    @objc func toggleAxiom(_ sender: NSButton) {
+        main.useAxioms[sender.tag - 1] = sender.state.rawValue == 0 ? false : true
     }
 
     override func viewDidLoad() {
@@ -149,7 +149,7 @@ class ConfigurationViewController: NSViewController,
             action: nil
         )
         useSquareButton.bind(
-            "value",
+            NSBindingName(rawValue: "value"),
             to: self,
             withKeyPath: "useSquare",
             options: nil
@@ -170,20 +170,20 @@ class ConfigurationViewController: NSViewController,
         widthInput.action = #selector(ConfigurationViewController.updateWidth)
         heightInput.action = #selector(ConfigurationViewController.updateHeight)
         widthInput.bind(
-            "enabled",
+            NSBindingName(rawValue: "enabled"),
             to: self,
             withKeyPath: "useSquare",
             options: [
-                NSValueTransformerNameBindingOption:
+                .valueTransformerName:
                     NSValueTransformerName.negateBooleanTransformerName
             ]
         )
         heightInput.bind(
-            "enabled",
+            NSBindingName(rawValue: "enabled"),
             to: self,
             withKeyPath: "useSquare",
             options: [
-                NSValueTransformerNameBindingOption:
+                .valueTransformerName:
                     NSValueTransformerName.negateBooleanTransformerName
             ]
         )
@@ -209,7 +209,7 @@ class ConfigurationViewController: NSViewController,
                 target: self,
                 action: #selector(ConfigurationViewController.toggleAxiom(_:))
             )
-            axiomButton.state = 1
+            axiomButton.state = NSControl.StateValue(rawValue: 1)
             axiomButton.tag = i
             axiomsStack.addArrangedSubview(axiomButton)
             if i == 7 {
@@ -235,7 +235,10 @@ class ConfigurationViewController: NSViewController,
         let maxRankStack = NSStackView(
             views: [maxRankText, maxRankSelector]
         )
-        maxRankSelector.setContentHuggingPriority(249, for: .horizontal)
+        maxRankSelector.setContentHuggingPriority(
+            NSLayoutConstraint.Priority(rawValue: 249),
+            for: .horizontal
+        )
         maxRankStack.orientation = .horizontal
 
         errorMessage = NSTextField()
@@ -247,33 +250,36 @@ class ConfigurationViewController: NSViewController,
             action: #selector(ConfigurationViewController.reinitialize)
         )
         reinitializeButton.bind(
-            "enabled",
+            NSBindingName(rawValue: "enabled"),
             to: self,
             withKeyPath: "isWidthValid",
             options: nil
         )
         reinitializeButton.bind(
-            "enabled2",
+            NSBindingName(rawValue: "enabled2"),
             to: self,
             withKeyPath: "isHeightValid",
             options: nil
         )
         reinitializeButton.bind(
-            "enabled3",
+            NSBindingName(rawValue: "enabled3"),
             to: self,
             withKeyPath: "delegate.hasFinishedInitialization",
             options: nil
         )
         reinitializeButton.bind(
-            "enabled4",
+            NSBindingName(rawValue: "enabled4"),
             to: self,
             withKeyPath: "isEditing",
             options: [
-                NSValueTransformerNameBindingOption:
+                .valueTransformerName:
                     NSValueTransformerName.negateBooleanTransformerName
             ]
         )
-        reinitializeButton.setContentHuggingPriority(261, for: .horizontal)
+        reinitializeButton.setContentHuggingPriority(
+            NSLayoutConstraint.Priority(rawValue: 261),
+            for: .horizontal
+        )
 
         let stackView = NSStackView(
             views: [

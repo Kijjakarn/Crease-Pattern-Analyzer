@@ -13,10 +13,10 @@ protocol InstructionViewControllerDelegate: class {
 }
 
 class InstructionViewController: NSViewController {
-    dynamic weak var delegate: InstructionViewControllerDelegate!
+    @objc dynamic weak var delegate: InstructionViewControllerDelegate!
 
-    dynamic var enableNextButton = false
-    dynamic var enablePreviousButton = false
+    @objc dynamic var enableNextButton = false
+    @objc dynamic var enablePreviousButton = false
 
     var viewNumber: Int = 0 {
         didSet {
@@ -78,13 +78,13 @@ class InstructionViewController: NSViewController {
             action: #selector(InstructionViewController.showPrevious)
         )
         previousButton.bind(
-            "enabled",
+            NSBindingName(rawValue: "enabled"),
             to: self,
             withKeyPath: "enablePreviousButton",
             options: nil
         )
         previousButton.bind(
-            "enabled2",
+            NSBindingName(rawValue: "enabled2"),
             to: self,
             withKeyPath: "delegate.hasFinishedInitialization",
             options: nil
@@ -96,13 +96,13 @@ class InstructionViewController: NSViewController {
             action: #selector(InstructionViewController.showNext)
         )
         nextButton.bind(
-            "enabled",
+            NSBindingName(rawValue: "enabled"),
             to: self,
             withKeyPath: "enableNextButton",
             options: nil
         )
         nextButton.bind(
-            "enabled2",
+            NSBindingName(rawValue: "enabled2"),
             to: self,
             withKeyPath: "delegate.hasFinishedInitialization",
             options: nil
@@ -121,7 +121,7 @@ class InstructionViewController: NSViewController {
         previousButton.translatesAutoresizingMaskIntoConstraints   = false
         nextButton.translatesAutoresizingMaskIntoConstraints       = false
         scrollView.translatesAutoresizingMaskIntoConstraints       = false
-        instruction.autoresizingMask = .viewWidthSizable
+        instruction.autoresizingMask = .width
 
         stackView.orientation = .vertical
         stackView.alignment = .left
@@ -141,11 +141,11 @@ class InstructionViewController: NSViewController {
         scrollView.borderType = .noBorder
     }
 
-    func showPrevious() {
+    @objc func showPrevious() {
         viewNumber -= 1
     }
 
-    func showNext() {
+    @objc func showNext() {
         viewNumber += 1
     }
 

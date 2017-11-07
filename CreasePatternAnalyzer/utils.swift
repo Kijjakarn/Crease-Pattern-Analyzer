@@ -143,10 +143,10 @@ func coalesceInstructions() {
 // Insert the instruction from `i` to just after the first instruction
 // (sentence) already contained in `j`
 func insertInstruction(fromIndex i: Int, toIndex j: Int) {
-    let firstPeriod = main.instructions[j].characters.index(of: ".")!
+    let firstPeriod = main.instructions[j].index(of: ".")!
     let insertionIndex = main.instructions[j].index(firstPeriod, offsetBy: 1)
     let insertionString = " " + main.instructions[i]
-    main.instructions[j].insert(contentsOf: insertionString.characters,
+    main.instructions[j].insert(contentsOf: insertionString,
                                         at: insertionIndex)
 }
 

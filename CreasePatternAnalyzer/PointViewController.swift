@@ -17,7 +17,7 @@ protocol PointViewControllerDelegate: class {
 }
 
 class PointViewController: NSViewController, NSTableViewDelegate {
-    dynamic weak var delegate: PointViewControllerDelegate!
+    @objc dynamic weak var delegate: PointViewControllerDelegate!
 
     var x: Double = 0 {
         willSet {
@@ -32,16 +32,16 @@ class PointViewController: NSViewController, NSTableViewDelegate {
     }
 
     let initializationQueue =
-        (NSApplication.shared().delegate as! AppDelegate).initializationQueue
+        (NSApplication.shared.delegate as! AppDelegate).initializationQueue
 
     // Variables for enabling/disabling the findPoint button
-    dynamic var isXValid = false
-    dynamic var isYValid = false
+    @objc dynamic var isXValid = false
+    @objc dynamic var isYValid = false
 
-    dynamic var foundPoints = [PointReference]()
+    @objc dynamic var foundPoints = [PointReference]()
 
-    dynamic var xString = ""
-    dynamic var yString = ""
+    @objc dynamic var xString = ""
+    @objc dynamic var yString = ""
 
     var xInput:          NSTextField!
     var yInput:          NSTextField!
@@ -52,7 +52,7 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         view = NSView()
     }
 
-    func updateX(_ sender: NSTextField) {
+    @objc func updateX(_ sender: NSTextField) {
         let parsedX = Parser.parsedString(from: sender.stringValue)
         if parsedX.success {
             validate(x: parsedX.value)
@@ -65,7 +65,7 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         }
     }
 
-    func updateY(_ sender: NSTextField) {
+    @objc func updateY(_ sender: NSTextField) {
         let parsedY = Parser.parsedString(from: sender.stringValue)
         if parsedY.success {
             validate(y: parsedY.value)
@@ -104,7 +104,7 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         }
     }
 
-    func findPoint() {
+    @objc func findPoint() {
         foundPoints = matchedPoints(for: PointVector(x, y))
     }
 
@@ -128,7 +128,12 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         xInput.action = #selector(PointViewController.updateX)
         xInput.target = self
         xOutput.alignment = .right
-        xOutput.bind("value", to: self, withKeyPath: "xString", options: nil)
+        xOutput.bind(
+            NSBindingName(rawValue: "value"),
+            to: self,
+            withKeyPath: "xString",
+            options: nil
+        )
         let xStack = NSStackView(
             views: [xText, xColon, xInput, xEquals, xOutput]
         )
@@ -151,7 +156,12 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         yInput.action = #selector(PointViewController.updateY)
         yInput.target = self
         yOutput.alignment = .right
-        yOutput.bind("value", to: self, withKeyPath: "yString", options: nil)
+        yOutput.bind(
+            NSBindingName(rawValue: "value"),
+            to: self,
+            withKeyPath: "yString",
+            options: nil
+        )
         let yStack = NSStackView(
             views: [yText, yColon, yInput, yEquals, yOutput]
         )
@@ -169,19 +179,19 @@ class PointViewController: NSViewController, NSTableViewDelegate {
             action: #selector(PointViewController.findPoint)
         )
         findPointButton.bind(
-            "enabled",
+            NSBindingName(rawValue: "enabled"),
             to: self,
             withKeyPath: "isXValid",
             options: nil
         )
         findPointButton.bind(
-            "enabled2",
+            NSBindingName(rawValue: "enabled2"),
             to: self,
             withKeyPath: "isYValid",
             options: nil
         )
         findPointButton.bind(
-            "enabled3",
+            NSBindingName(rawValue: "enabled3"),
             to: self,
             withKeyPath: "delegate.hasFinishedInitialization",
             options: nil
@@ -195,9 +205,15 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         let foundPointsTableView  = NSTableView()
         foundPointsTableView.delegate = self
         arrayController = NSArrayController()
-        let pointsColumn = NSTableColumn(identifier: "Point")
-        let ranksColumn  = NSTableColumn(identifier: "Rank")
-        let errorsColumn = NSTableColumn(identifier: "Error")
+        let pointsColumn = NSTableColumn(
+            identifier: NSUserInterfaceItemIdentifier(rawValue: "Point")
+        )
+        let ranksColumn  = NSTableColumn(
+            identifier: NSUserInterfaceItemIdentifier(rawValue: "Rank")
+        )
+        let errorsColumn = NSTableColumn(
+            identifier: NSUserInterfaceItemIdentifier(rawValue: "Error")
+        )
         pointsColumn.title = "Point"
         ranksColumn.title  = "Rank"
         errorsColumn.title = "Error"
@@ -206,7 +222,7 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         ranksColumn.headerCell.alignment  = .center
         errorsColumn.headerCell.alignment = .center
         pointsColumn.bind(
-            "value",
+            NSBindingName(rawValue: "value"),
             to: arrayController,
             withKeyPath: "arrangedObjects.pointString",
             options: nil
@@ -222,13 +238,13 @@ class PointViewController: NSViewController, NSTableViewDelegate {
             selector: #selector(NSNumber.compare(_:))
         )
         ranksColumn.bind(
-            "value",
+            NSBindingName(rawValue: "value"),
             to: arrayController,
             withKeyPath: "arrangedObjects.rank",
             options: nil
         )
         errorsColumn.bind(
-            "value",
+            NSBindingName(rawValue: "value"),
             to: arrayController,
             withKeyPath: "arrangedObjects.distanceError",
             options: nil
@@ -237,35 +253,35 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         foundPointsTableView.addTableColumn(ranksColumn)
         foundPointsTableView.addTableColumn(errorsColumn)
         foundPointsTableView.bind(
-            "content",
+            NSBindingName(rawValue: "content"),
             to: arrayController,
             withKeyPath: "arrangedObjects",
             options: nil
         )
         foundPointsTableView.bind(
-            "selectionIndexes",
+            NSBindingName(rawValue: "selectionIndexes"),
             to: arrayController,
             withKeyPath: "selectionIndexes",
             options: nil
         )
         foundPointsTableView.bind(
-            "sortDescriptors",
+            NSBindingName(rawValue: "sortDescriptors"),
             to: arrayController,
             withKeyPath: "sortDescriptors",
             options: nil
         )
         arrayController.bind(
-            "contentArray",
+            NSBindingName(rawValue: "contentArray"),
             to: self,
             withKeyPath: "foundPoints",
             options: nil
         )
         arrayController.bind(
-            "sortDescriptors",
-            to: NSUserDefaultsController.shared(),
+            NSBindingName(rawValue: "sortDescriptors"),
+            to: NSUserDefaultsController.shared,
             withKeyPath: "values.sortDescriptors",
             options: [
-                NSValueTransformerNameBindingOption:
+                .valueTransformerName:
                     NSValueTransformerName.unarchiveFromDataTransformerName
             ]
         )
@@ -304,7 +320,10 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         findPointButton.rightAnchor
                        .constraint(equalTo: stackView.rightAnchor)
                        .isActive = true
-        findPointButton.setContentHuggingPriority(261, for: .horizontal)
+        findPointButton.setContentHuggingPriority(
+            NSLayoutConstraint.Priority(rawValue: 261),
+            for: .horizontal
+        )
 
         foundPointsScrollView.translatesAutoresizingMaskIntoConstraints = false
         foundPointsScrollView.heightAnchor
@@ -356,7 +375,7 @@ class PointViewController: NSViewController, NSTableViewDelegate {
           willDisplayCell cell: Any,
                for tableColumn: NSTableColumn?,
                            row: Int) {
-        if tableColumn?.identifier == "Rank" {
+        if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Rank") {
             if let cell = cell as? NSCell {
                 cell.alignment = .center
             }

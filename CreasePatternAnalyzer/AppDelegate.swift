@@ -17,7 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let window = NSWindow(
-            contentRect: NSScreen.main()!.frame,
+            contentRect: NSScreen.main!.frame,
             styleMask: [.resizable, .titled, .closable],
             backing: .retained,
             defer: false
@@ -36,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func setUpMenu() {
         let mainMenu = NSMenu()
-        NSApplication.shared().mainMenu = mainMenu
+        NSApplication.shared.mainMenu = mainMenu
 
         let mainMenuItem = NSMenuItem()
         mainMenu.addItem(mainMenuItem)
@@ -49,7 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             keyEquivalent: "q"
         )
         quitApplicationItem.keyEquivalentModifierMask = .command
-        quitApplicationItem.target = NSApplication.shared()
+        quitApplicationItem.target = NSApplication.shared
         mainMenuMenu.addItem(quitApplicationItem)
 
         let fileMenuItem = NSMenuItem()
@@ -67,7 +67,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         fileMenu.addItem(openImageItem)
     }
 
-    func openImage() {
+    @objc func openImage() {
         let openPanel = NSOpenPanel()
         openPanel.canChooseFiles = true
         openPanel.canChooseDirectories = false
@@ -75,7 +75,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openPanel.allowedFileTypes = ["jpg", "jpeg", "png", "bmp"]
         openPanel.beginSheetModal(for: mainWindowController.window!) {
             switch $0 {
-            case NSFileHandlingPanelOKButton:
+            case .OK:
                 if openPanel.urls.count == 0 {
                     break
                 }

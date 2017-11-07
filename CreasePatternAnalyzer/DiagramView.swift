@@ -92,7 +92,7 @@ class DiagramView: NSView {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(DiagramView.updatePaddingAndDrawAll(_:)),
-            name: NSNotification.Name.NSViewFrameDidChange,
+            name: NSView.frameDidChangeNotification,
             object: nil
         )
         postsFrameChangedNotifications = true
@@ -312,12 +312,12 @@ class DiagramView: NSView {
             let pointLabelLayer = CATextLayer()
             pointLabelsLayer.addSublayer(pointLabelLayer)
             pointLabelLayer.contentsScale =
-                NSScreen.main()!.backingScaleFactor
+                NSScreen.main!.backingScaleFactor
             pointLabelLayer.foregroundColor = NSColor.red.cgColor
             pointLabelLayer.fontSize = fontSize
             pointLabelLayer.string = pointReference.label
             let size = pointReference.label.size(withAttributes: [
-                NSFontAttributeName: NSFont.labelFont(ofSize: fontSize),
+                .font: NSFont.labelFont(ofSize: fontSize),
             ])
             pointLabelLayer.bounds = CGRect(origin: CGPoint.zero,
                                               size: size)
@@ -416,12 +416,12 @@ class DiagramView: NSView {
                                   point2: PointVector) {
         let lineLabelLayer = CATextLayer()
         lineLabelsLayer.addSublayer(lineLabelLayer)
-        lineLabelLayer.contentsScale = NSScreen.main()!.backingScaleFactor
+        lineLabelLayer.contentsScale = NSScreen.main!.backingScaleFactor
         lineLabelLayer.foregroundColor = CGColor.black
         lineLabelLayer.fontSize = fontSize
         lineLabelLayer.string = lineReference.label
         let size = lineReference.label.size(withAttributes: [
-            NSFontAttributeName: NSFont.labelFont(ofSize: fontSize),
+            .font: NSFont.labelFont(ofSize: fontSize),
         ])
         lineLabelLayer.bounds = CGRect(origin: CGPoint.zero, size: size)
 
