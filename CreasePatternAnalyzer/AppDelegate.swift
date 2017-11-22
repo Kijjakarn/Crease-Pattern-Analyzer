@@ -76,9 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     break
                 }
                 let fileURL = openPanel.urls[0]
-                OperationQueue().addOperation {
-                    self.mainViewController.processImage(url: fileURL)
-                }
+                self.mainViewController.processImage(url: fileURL)
             default:
                 break
             }
