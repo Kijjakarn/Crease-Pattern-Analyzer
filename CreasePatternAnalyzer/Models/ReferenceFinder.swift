@@ -66,6 +66,8 @@ class ReferenceFinder {
     // Array containing sets of lines, one set for each rank
     var allLines  = [Set<LineReference>]()
 
+    var shouldStopInitialization = false
+
     static var singleton = ReferenceFinder()
 
     var diagrams     = [Diagram]()

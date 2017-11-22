@@ -25,10 +25,8 @@ class MainViewController: NSViewController,
     var instructionVC:   InstructionViewController!
     var diagramView:     DiagramView!
 
+    let initializationQueue = DispatchQueue(label: "Initialization Queue")
     @objc dynamic var hasFinishedInitialization = false
-
-    let initializationQueue =
-        (NSApplication.shared.delegate as! AppDelegate).initializationQueue
 
     var buttons: [NSButton]!
 
@@ -103,22 +101,8 @@ class MainViewController: NSViewController,
         configurationVC.delegate = self
         instructionVC.delegate   = self
 
-        initializationQueue.addObserver(
-            self,
-            forKeyPath: #keyPath(OperationQueue.operationCount),
-            context: nil
-        )
-    }
-
-    override func observeValue(forKeyPath keyPath: String?,
-                                        of object: Any?,
-                                           change: [NSKeyValueChangeKey : Any]?,
-                                          context: UnsafeMutableRawPointer?) {
-        // Disable all buttons if solutions are being initialized
-        if keyPath == "operationCount" {
-            hasFinishedInitialization = initializationQueue.operationCount == 0
-            CATransaction.commit()
-        }
+        // Start the initialization
+        initialize()
     }
 
     // MARK: - MainWindowControllerDelegate
@@ -183,21 +167,38 @@ class MainViewController: NSViewController,
     // MARK: - ConfigurationViewControllerDelegate
 
     func reinitialize() {
-        // Remove all found points in table
-        pointVC.foundPoints.removeAll()
+        // Stop the current initialization
+        main.shouldStopInitialization = true
 
-        // Update paper
-        emptyInstructions()
+        initializationQueue.async {
+            DispatchQueue.main.async {
+                // Remove all found points in table
+                self.pointVC.foundPoints.removeAll()
+                self.emptyInstructions()
 
-        // Cancel current initialization
-        initializationQueue.cancelAllOperations()
-        initializationQueue.waitUntilAllOperationsAreFinished()
-        let width  = configurationVC.width
-        let height = configurationVC.height
-        main.paper = Rectangle(width: 1, height: height/width)
-        initializationQueue.addOperation {
-            makeAllPointsAndLines()
+                // Update paper
+                let width  = self.configurationVC.width
+                let height = self.configurationVC.height
+                main.paper = Rectangle(width: 1, height: height/width)
+
+                self.initialize()
+            }
         }
+    }
+
+    func initialize() {
+        main.shouldStopInitialization = false
+        hasFinishedInitialization = false
+        initializationQueue.async {
+            makeAllPointsAndLines()
+            DispatchQueue.main.async {
+                self.hasFinishedInitialization = true
+            }
+        }
+    }
+
+    func stopInitialization() {
+        main.shouldStopInitialization = true
     }
 
     // MARK: DiagramViewDelegate

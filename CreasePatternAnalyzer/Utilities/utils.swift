@@ -58,6 +58,11 @@ func makeAllPointsAndLines() {
     var numPoints = 0
     var numLines  = 0
     for rank in 1...main.maxRank {
+        if main.shouldStopInitialization {
+            print("Initialization stopped")
+            break
+        }
+
         let rankStartTime = Date()
 
         // Variables to store lines and points generated from each axiom
@@ -83,8 +88,11 @@ func makeAllPointsAndLines() {
         DispatchQueue.concurrentPerform(iterations: 1 + rank/2) { i in
             var newPointsLocal = Set<PointReference>()
             let j = rank - i
-            for line1 in main.allLines[i] {
+            outerLoop: for line1 in main.allLines[i] {
             for line2 in main.allLines[j] {
+                if main.shouldStopInitialization {
+                    break outerLoop
+                }
                 if let point = intersection(angleConstraint: main.minAngle,
                                             line1.line,
                                             line2.line),

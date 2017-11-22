@@ -11,6 +11,7 @@ import Cocoa
 @objc
 protocol ConfigurationViewControllerDelegate: class {
     func reinitialize()
+    func stopInitialization()
 }
 
 class TextField: NSTextField {
@@ -50,9 +51,6 @@ class ConfigurationViewController: NSViewController,
             }
         }
     }
-
-    let initializationQueue =
-        (NSApplication.shared.delegate as! AppDelegate).initializationQueue
 
     var widthInput:   TextField!
     var heightInput:  TextField!
@@ -121,10 +119,6 @@ class ConfigurationViewController: NSViewController,
 
     @objc func setMaxRank(_ sender: NSPopUpButton) {
         main.maxRank = sender.indexOfSelectedItem + 1
-    }
-
-    @objc func reinitialize() {
-        delegate.reinitialize()
     }
 
     @objc func toggleAxiom(_ sender: NSButton) {
@@ -246,8 +240,8 @@ class ConfigurationViewController: NSViewController,
 
         let reinitializeButton = NSButton(
             title: "Reinitialize",
-            target: self,
-            action: #selector(ConfigurationViewController.reinitialize)
+            target: delegate,
+            action: #selector(ConfigurationViewControllerDelegate.reinitialize)
         )
         reinitializeButton.bind(
             NSBindingName(rawValue: "enabled"),
@@ -264,12 +258,6 @@ class ConfigurationViewController: NSViewController,
         reinitializeButton.bind(
             NSBindingName(rawValue: "enabled3"),
             to: self,
-            withKeyPath: "delegate.hasFinishedInitialization",
-            options: nil
-        )
-        reinitializeButton.bind(
-            NSBindingName(rawValue: "enabled4"),
-            to: self,
             withKeyPath: "isEditing",
             options: [
                 .valueTransformerName:
@@ -277,6 +265,27 @@ class ConfigurationViewController: NSViewController,
             ]
         )
         reinitializeButton.setContentHuggingPriority(
+            NSLayoutConstraint.Priority(rawValue: 261),
+            for: .horizontal
+        )
+
+        let stopInitializationButton = NSButton(
+            title: "Stop Initialization",
+            target: delegate,
+            action: #selector(
+                ConfigurationViewControllerDelegate.stopInitialization
+            )
+        )
+        stopInitializationButton.bind(
+            NSBindingName(rawValue: "enabled"),
+            to: self,
+            withKeyPath: "delegate.hasFinishedInitialization",
+            options: [
+                .valueTransformerName:
+                    NSValueTransformerName.negateBooleanTransformerName
+            ]
+        )
+        stopInitializationButton.setContentHuggingPriority(
             NSLayoutConstraint.Priority(rawValue: 261),
             for: .horizontal
         )
@@ -290,6 +299,7 @@ class ConfigurationViewController: NSViewController,
                 maxRankStack,
                 errorMessage,
                 reinitializeButton,
+                stopInitializationButton,
             ]
         )
         stackView.orientation = .vertical
@@ -330,6 +340,13 @@ class ConfigurationViewController: NSViewController,
         reinitializeButton.rightAnchor
                           .constraint(equalTo: stackView.rightAnchor)
                           .isActive = true
+
+        stopInitializationButton
+            .translatesAutoresizingMaskIntoConstraints = false
+        stopInitializationButton
+            .rightAnchor
+            .constraint(equalTo: stackView.rightAnchor)
+            .isActive = true
     }
 
     func setUp(textField: NSTextField) {

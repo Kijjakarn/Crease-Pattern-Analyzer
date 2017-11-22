@@ -10,7 +10,6 @@ import Cocoa
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     let applicationName = Bundle.main.infoDictionary?["CFBundleName"] as! String
-    var initializationQueue = OperationQueue()
 
     var mainViewController:   MainViewController!
     var mainWindowController: NSWindowController!
@@ -28,9 +27,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         mainWindowController.contentViewController = mainViewController
         mainWindowController.showWindow(self)
         self.mainWindowController = mainWindowController
-        initializationQueue.addOperation {
-            makeAllPointsAndLines()
-        }
         setUpMenu()
     }
 

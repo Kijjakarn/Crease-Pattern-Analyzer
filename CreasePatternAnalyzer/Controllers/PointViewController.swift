@@ -31,9 +31,6 @@ class PointViewController: NSViewController, NSTableViewDelegate {
         }
     }
 
-    let initializationQueue =
-        (NSApplication.shared.delegate as! AppDelegate).initializationQueue
-
     // Variables for enabling/disabling the findPoint button
     @objc dynamic var isXValid = false
     @objc dynamic var isYValid = false
