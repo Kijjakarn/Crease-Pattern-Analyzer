@@ -212,7 +212,6 @@ class BinaryImage {
             currentX += 1
         }
         let blurredImage = gaussianBlur(image: grayImage)
-        // let blurredImage = grayImage
 
         // Find the binarization threshold using Otsu's method
         var histogram = Array(repeating: 0, count: 256)
@@ -336,58 +335,49 @@ func print<T>(_ data: [[T]]) {
 }
 
 // Find the center of a window within the array with the largest sum
-func maxIndex(in accumulator: [[Int]], radius: Int) -> (Int, Int) {
-    let thetasCount = accumulator.count
-    let rhosCount   = accumulator[0].count
-
+func maxIndex(in accumulator: [Int], radius: Int,
+  thetasCount: Int, rhosCount: Int) -> (Int, Int) {
     assert(2*radius + 1 <= thetasCount && 2*radius + 1 <= rhosCount,
            "Window exceeds the bounds of the accumulator")
 
-    // Sum the accumulator in the horizontal direction and put it in sumH
-    var sumH = Array(
-        repeating: Array(repeating: 0, count: rhosCount),
-        count: thetasCount - 2*radius
-    )
+    var sumH = Array(repeating: 0, count: rhosCount*(thetasCount - 2*radius))
     for j in 0..<rhosCount {
         for i in 0...(2*radius) {
-            sumH[0][j] += accumulator[i][j]
+            sumH[j] += accumulator[i*rhosCount + j]
         }
         for i in (radius + 1)..<(thetasCount - radius) {
-            sumH[i - radius][j] = sumH[i - radius - 1][j]
-                                + accumulator[i + radius][j]
-                                - accumulator[i - radius - 1][j]
+            sumH[(i - radius)*rhosCount + j] =
+                sumH[(i - radius - 1)*rhosCount + j]
+              + accumulator[(i + radius)*rhosCount + j]
+              - accumulator[(i - radius - 1)*rhosCount + j]
         }
     }
 
-    // Sum sumH in the vertical direction in and put it in sumV
-    var sumV = Array(
-        repeating: Array(repeating: 0, count: rhosCount - 2*radius),
-        count: sumH.count
-    )
-    for i in 0..<sumV.count {
+    let sumVStride = rhosCount - 2*radius
+    var sumV = Array(repeating: 0,
+                         count: (thetasCount - 2*radius)*sumVStride)
+    for i in 0..<(thetasCount - 2*radius) {
         for j in 0...(2*radius) {
-            sumV[i][0] += sumH[i][j]
+            sumV[i*sumVStride] += sumH[i*rhosCount + j]
         }
         for j in (radius + 1)..<(rhosCount - radius) {
-            sumV[i][j - radius] = sumV[i][j - radius - 1]
-                                + sumH[i][j + radius]
-                                - sumH[i][j - radius - 1]
+            sumV[i*sumVStride + j - radius] =
+                sumV[i*sumVStride + j - radius - 1]
+              + sumH[i*rhosCount + j + radius]
+              - sumH[i*rhosCount + j - radius - 1]
         }
     }
 
-    // Find the index of the maximum value in sumV
-    var thetaIndex = 0
-    var rhoIndex   = 0
-    var maxValue   = -1
-    for i in 0..<sumV.count {
-        for j in 0..<sumV[i].count {
-            if sumV[i][j] > maxValue {
-                thetaIndex = i
-                rhoIndex   = j
-                maxValue   = sumV[i][j]
-            }
+    var index = 0
+    var max = sumV[0]
+    for i in 1..<sumV.count {
+        if sumV[i] > max {
+            max = sumV[index]
+            index = i
         }
     }
+    let thetaIndex = index / sumVStride
+    let rhoIndex = index % sumVStride
 
     return (thetaIndex + radius, rhoIndex + radius)
 }
@@ -422,7 +412,7 @@ func houghTransform(binaryImage image: [[Bool]],
 
 // Perform Hough transform, with the origin placed at the center of the image
 func houghTransformCenter(binaryImage image: [[Bool]],
-        thetaFraction: Int, rhoFraction: Int) -> [[Int]] {
+  thetaFraction: Int, rhoFraction: Int) -> ([Int], (Int, Int)) {
     let width       = image.count
     let height      = image[0].count
     let midX        = Double(width)/2
@@ -431,8 +421,7 @@ func houghTransformCenter(binaryImage image: [[Bool]],
     let rhoOffset   = Int(floor(diagonal))*rhoFraction
     let rhosCount   = 2*rhoOffset + 1
     let thetasCount = 181*thetaFraction
-    var accumulator = Array(repeating: Array(repeating: 0, count: rhosCount),
-                                count: thetasCount)
+    var accumulator = Array(repeating: 0, count: rhosCount*thetasCount)
     for x in 0..<width {
         for y in 0..<height {
             if image[x][y] {
@@ -441,12 +430,12 @@ func houghTransformCenter(binaryImage image: [[Bool]],
                     let rho = (Double(x) - midX)*cos(theta)
                             + (Double(y) - midY)*sin(theta)
                     let rhoIndex = rhoOffset + Int(rho)*rhoFraction
-                    accumulator[thetaIndex][rhoIndex] += 1
+                    accumulator[thetaIndex*rhosCount + rhoIndex] += 1
                 }
             }
         }
     }
-    return accumulator
+    return (accumulator, (rhosCount, thetasCount))
 }
 
 // Find the intersections between the line defined by (theta, rho) and the
@@ -508,151 +497,6 @@ func neighboringPixelsValue(image: [[Bool]], x: Int, y: Int, radius: Int = 1)
     return sum
 }
 
-/* // Sum the pixel values of the 3 x 3 square centered at (x, y)
-// A neighbor that is out of bounds is considered to have a value of 0
-func neighboringPixelsValue(image: [[Bool]], x: Int, y: Int, radius: Int = 1)
-        -> Int {
-    let width  = image.count
-    let height = image[0].count
-
-    func pixelValue(_ x: Int, _ y: Int) -> Int {
-        if x < 0 || x >= width || y < 0 || y >= height {
-            return 0
-        }
-        return image[x][y] ? 1 : 0
-    }
-
-    let sum = pixelValue(x, y)
-            + pixelValue(x - 1, y)
-            + pixelValue(x + 1, y)
-            + pixelValue(x, y - 1)
-            + pixelValue(x, y + 1)
-
-    return (sum == 0 || sum > 3) ? 0 : 1
-} */
-
-/* // A neighbor that is out of bounds is considered to have a value of 0
-// `theta` is in the range [0, 360) degrees
-func neighboringPixelsValue(
-        image: [[Bool]], x: Int, y: Int, theta: Double) -> Int {
-    let width  = image.count
-    let height = image[0].count
-
-    func pixelValue(_ x: Int, _ y: Int) -> Int {
-        if x < 0 || x >= width || y < 0 || y >= height {
-            return 0
-        }
-        return image[x][y] ? 1 : 0
-    }
-
-    if theta <= 22.5 {
-        // return pixelValue(x, y)
-        //      + pixelValue(x - 1, y)
-        //      + pixelValue(x - 1, y - 1)
-        //      + pixelValue(x - 1, y + 1)
-        return pixelValue(x, y)
-             + pixelValue(x, y - 1)
-             + pixelValue(x, y + 1)
-             + pixelValue(x - 1, y)
-             + pixelValue(x - 1, y - 1)
-             + pixelValue(x - 1, y + 1)
-    }
-    if theta <= 67.5 {
-        // return pixelValue(x, y)
-        //      + pixelValue(x, y + 1)
-        //      + pixelValue(x - 1, y)
-        //      + pixelValue(x - 1, y + 1)
-        return pixelValue(x, y)
-             + pixelValue(x, y + 1)
-             + pixelValue(x - 1, y)
-             + pixelValue(x - 1, y + 1)
-             + pixelValue(x - 1, y - 1)
-             + pixelValue(x + 1, y + 1)
-    }
-    if theta <= 112.5 {
-        return pixelValue(x, y)
-             + pixelValue(x, y + 1)
-             + pixelValue(x - 1, y + 1)
-             + pixelValue(x + 1, y + 1)
-        return pixelValue(x, y)
-             + pixelValue(x, y + 1)
-             + pixelValue(x - 1, y)
-             + pixelValue(x - 1, y + 1)
-             + pixelValue(x + 1, y)
-             + pixelValue(x + 1, y + 1)
-    }
-    if theta <= 157.5 {
-        return pixelValue(x, y)
-             + pixelValue(x + 1, y + 1)
-             + pixelValue(x + 1, y)
-             + pixelValue(x + 1, y + 1)
-        return pixelValue(x, y)
-             + pixelValue(x, y + 1)
-             + pixelValue(x - 1, y + 1)
-             + pixelValue(x + 1, y + 1)
-             + pixelValue(x + 1, y)
-             + pixelValue(x + 1, y + 1)
-    }
-    if theta <= 202.5 {
-        return pixelValue(x, y)
-             + pixelValue(x + 1, y)
-             + pixelValue(x + 1, y - 1)
-             + pixelValue(x + 1, y + 1)
-        return pixelValue(x, y)
-             + pixelValue(x, y - 1)
-             + pixelValue(x, y + 1)
-             + pixelValue(x + 1, y)
-             + pixelValue(x + 1, y - 1)
-             + pixelValue(x + 1, y + 1)
-    }
-    if theta <= 247.5 {
-        return pixelValue(x, y)
-             + pixelValue(x, y - 1)
-             + pixelValue(x + 1, y)
-             + pixelValue(x + 1, y - 1)
-        return pixelValue(x, y)
-             + pixelValue(x, y - 1)
-             + pixelValue(x - 1, y - 1)
-             + pixelValue(x + 1, y)
-             + pixelValue(x + 1, y - 1)
-             + pixelValue(x + 1, y + 1)
-    }
-    if theta <= 292.5 {
-        return pixelValue(x, y)
-             + pixelValue(x, y - 1)
-             + pixelValue(x - 1, y - 1)
-             + pixelValue(x + 1, y - 1)
-        return pixelValue(x, y)
-             + pixelValue(x, y - 1)
-             + pixelValue(x - 1, y)
-             + pixelValue(x - 1, y - 1)
-             + pixelValue(x + 1, y)
-             + pixelValue(x + 1, y - 1)
-    }
-    if theta <= 337.5 {
-        return pixelValue(x, y)
-             + pixelValue(x, y - 1)
-             + pixelValue(x - 1, y)
-             + pixelValue(x - 1, y - 1)
-        return pixelValue(x, y)
-             + pixelValue(x, y - 1)
-             + pixelValue(x - 1, y)
-             + pixelValue(x - 1, y - 1)
-             + pixelValue(x - 1, y + 1)
-             + pixelValue(x + 1, y - 1)
-    }
-    return pixelValue(x, y)
-         + pixelValue(x - 1, y)
-         + pixelValue(x - 1, y - 1)
-         + pixelValue(x - 1, y + 1)
-    return pixelValue(x, y)
-         + pixelValue(x, y - 1)
-         + pixelValue(x, y + 1)
-         + pixelValue(x - 1, y)
-         + pixelValue(x - 1, y - 1)
-         + pixelValue(x - 1, y + 1)
-} */
-
 // Return the distance between two points
 func distance(_ a: Point, _ b: Point) -> Double {
     let deltaX = a.0 - b.0
@@ -666,31 +510,34 @@ func getLineSegments(binaryImage image: [[Bool]], comparisonImage: [[Bool]])
     let height        = Double(image[0].count)
     let thetaFraction = 3.0
     let rhoFraction   = 2.0
-    /* var accumulator   = houghTransform(binaryImage: image,
-                                     thetaFraction: Int(thetaFraction),
-                                       rhoFraction: Int(rhoFraction)) */
-    var accumulator = houghTransformCenter(binaryImage: image,
-                                         thetaFraction: Int(thetaFraction),
-                                           rhoFraction: Int(rhoFraction))
-    let thetasCount = accumulator.count
-    let rhosCount   = accumulator[0].count
+    var (accumulator, (rhosCount, thetasCount)) = houghTransformCenter(
+        binaryImage: image,
+        thetaFraction: Int(thetaFraction),
+        rhoFraction: Int(rhoFraction)
+    )
     let rhoOffset   = (rhosCount - 1)/2
     let iterationsCount = 50
     var allLineSegments = [(Point, Point)]()
-    // print(accumulator)
 
     // Minimum length of each line segment
     let lengthMin = sqrt(width*width + height*height)/50
 
     // Extract line segments corresponding to each peak
     for i in 0..<iterationsCount {
-        print("Iteration \(i)")
-        // let (thetaIndex, rhoIndex) = maxIndex(in: accumulator, radius: 1)
-        let (thetaIndex, rhoIndex) = maxIndex(in: accumulator, radius: 1)
+        let (thetaIndex, rhoIndex) = maxIndex(in: accumulator,
+                                          radius: 1,
+                                     thetasCount: thetasCount,
+                                       rhosCount: rhosCount)
+
         let rho   = Double(rhoIndex - rhoOffset)/rhoFraction
-        let theta = Double(thetaIndex)*π/180/thetaFraction
-        /* let endpoints = clip(width: width, height: height,
-                             theta: theta, rho: rho) */
+        var theta = Double(thetaIndex)*π/180/thetaFraction
+
+        // Snap lines at 11.25º angles
+        var remainder = theta.truncatingRemainder(dividingBy: π/16)
+        if abs(remainder) <= π/60 {
+            theta -= remainder
+        }
+
         let endpoints = clip(
             width: width,
             height: height,
@@ -757,20 +604,19 @@ func getLineSegments(binaryImage image: [[Bool]], comparisonImage: [[Bool]])
                 let rho = (pointToRemove.0 -  width/2)*cos(theta)
                         + (pointToRemove.1 - height/2)*sin(theta)
                 let rhoIndex = rhoOffset + Int(rho*rhoFraction)
-                if accumulator[thetaIndex][rhoIndex] > 0 {
-                    accumulator[thetaIndex][rhoIndex] -= 1
+                if accumulator[thetaIndex*rhosCount + rhoIndex] > 0 {
+                    accumulator[thetaIndex*rhosCount + rhoIndex] -= 1
                 }
                 if rhoIndex - 1 >= 0
-                && accumulator[thetaIndex][rhoIndex - 1] > 0 {
-                    accumulator[thetaIndex][rhoIndex - 1] -= 1
+                && accumulator[thetaIndex*rhosCount + rhoIndex - 1] > 0 {
+                    accumulator[thetaIndex*rhosCount + rhoIndex - 1] -= 1
                 }
-                if rhoIndex + 1 < accumulator[thetaIndex].count
-                && accumulator[thetaIndex][rhoIndex + 1] > 0 {
-                    accumulator[thetaIndex][rhoIndex + 1] -= 1
+                if rhoIndex + 1 < rhosCount
+                && accumulator[thetaIndex*rhosCount + rhoIndex + 1] > 0 {
+                    accumulator[thetaIndex*rhosCount + rhoIndex + 1] -= 1
                 }
             }
         }
-        // print(accumulator)
 
         allLineSegments.append(contentsOf: lineSegments)
     }
@@ -814,8 +660,6 @@ func houghLinesProbabilistic(binaryImage image: [[Bool]],
 
     // Process all points in random order
     for count in stride(from: nonZeros.count, to: 0, by: -1) {
-        Swift.print(count)
-
         let index = Int(arc4random_uniform(UInt32(count)))
         let (x, y) = nonZeros[index]
         var maxVotesCount = threshold - 1
