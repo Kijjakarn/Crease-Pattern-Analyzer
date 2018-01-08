@@ -12,6 +12,7 @@ struct Arrow {
     let beginPoint:   PointVector
     let endPoint:     PointVector
     let controlPoint: PointVector
+    let center:       PointVector
     let arcRadius:    Double
 
     var width:  Double
@@ -19,14 +20,15 @@ struct Arrow {
 
     // The arrow will be drawn using an arc connecting `beginPoint` and
     // `endPoint` with a radius of 60º
-    init(beginPoint: PointVector, endPoint: PointVector)
-    {
+    init(beginPoint: PointVector, endPoint: PointVector) {
         let vector        = endPoint - beginPoint
+        let normal        = vector.rotatedBy90()
+        let midpoint      = (beginPoint + endPoint)/2
         self.beginPoint   = beginPoint
         self.endPoint     = endPoint
         self.arcRadius    = vector.magnitude
-        self.controlPoint = ((beginPoint + endPoint)
-                          + vector.rotatedBy90()/sqrt(3))/2
+        self.controlPoint = midpoint + normal/(2*sqrt(3))
+        self.center       = midpoint - normal*sqrt(3)/2
         let minPaperDimension = min(main.paper.width, main.paper.height)
         if arcRadius < minPaperDimension/6.0 {
             width = arcRadius/6.0
@@ -38,20 +40,22 @@ struct Arrow {
     }
 
     func arrowheadPoints() -> [PointVector] {
-        let tangent   = (controlPoint - endPoint).normalized()
-        let normal    = tangent.rotatedBy90()*width/2
-        let basePoint = endPoint  + tangent*height
-        let point1    = basePoint + normal
-        let point2    = basePoint - normal
+        let theta = 1.5*π + asin(height/(2*arcRadius))
+        let vector = (center - endPoint).normalized().rotatedBy(theta)*height
+        let normal = vector.rotatedBy90().normalized()*width/2
+        let basePoint = endPoint + vector
+        let point1 = basePoint + normal
+        let point2 = basePoint - normal
         return [point1, point2, endPoint]
     }
 
     func arrowtailPoints() -> [PointVector] {
-        let tangent   = (controlPoint - beginPoint).normalized()
-        let normal    = tangent.rotatedBy90()*width/2
-        let basePoint = beginPoint + tangent*height
-        let point1    = basePoint  + normal
-        let point2    = basePoint  - normal
+        let theta = π/2 - asin(height/(2*arcRadius))
+        let vector = (center - beginPoint).normalized().rotatedBy(theta)*height
+        let normal = vector.rotatedBy90().normalized()*width/2
+        let basePoint = beginPoint + vector
+        let point1 = basePoint + normal
+        let point2 = basePoint - normal
         return [point1, point2, beginPoint]
     }
 }

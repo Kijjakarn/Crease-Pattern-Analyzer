@@ -227,6 +227,7 @@ class DiagramView: NSView {
             arrowhead.move(to: viewPoint(from: arrowheadPoints[0]))
             arrowhead.addLine(to: viewPoint(from: arrowheadPoints[1]))
             arrowhead.addLine(to: viewPoint(from: arrowheadPoints[2]))
+            arrowhead.closeSubpath()
             arrowheadLayer.path = arrowhead
             arrowheadLayer.fillColor = CGColor.black
 
@@ -236,7 +237,7 @@ class DiagramView: NSView {
             arrowtail.move(to: viewPoint(from: arrowtailPoints[0]))
             arrowtail.addLine(to: viewPoint(from: arrowtailPoints[1]))
             arrowtail.addLine(to: viewPoint(from: arrowtailPoints[2]))
-            arrowtail.addLine(to: viewPoint(from: arrowtailPoints[0]))
+            arrowtail.closeSubpath()
             arrowtailLayer.path = arrowtail
             arrowtailLayer.fillColor = CGColor.white
             arrowtailLayer.strokeColor = CGColor.black
