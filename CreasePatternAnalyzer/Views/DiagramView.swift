@@ -19,7 +19,6 @@ protocol DiagramViewDelegate: class {
 class DiagramView: NSView {
     weak var delegate: DiagramViewDelegate!
 
-    var padding:           Double!
     var paperWidth:        Double!
     var paperHeight:       Double!
     var paperBottomLeft:   CGPoint!
@@ -171,29 +170,39 @@ class DiagramView: NSView {
     }
 
     @objc func updatePaddingAndDrawAll(_ note: Notification) {
-        padding = Double(min(frame.size.width/12, frame.size.height/12))
+        let height = main.paper.height
+        let width = main.paper.width
+        let boundsHeight = Double(bounds.height)
+        let boundsWidth  = Double(bounds.width)
+        let c = 2 - sqrt(3)
+
+        if boundsHeight*(width + c*height) < boundsWidth*(height + c*width) {
+            let heightScalingFactor = c/(2*(height/width + c))
+            let heightPadding = boundsHeight*heightScalingFactor
+            paperHeight = boundsHeight - 2*heightPadding
+            paperWidth  = (width/height)*paperHeight
+            paperBottomLeft = CGPoint(
+                x: (boundsWidth - paperWidth)/2,
+                y: heightPadding
+            )
+        }
+        else {
+            let widthScalingFactor  = c/(2*(width/height + c))
+            let widthPadding = boundsWidth*widthScalingFactor
+            paperWidth  = boundsWidth - 2*widthPadding
+            paperHeight = (height/width)*paperWidth
+            paperBottomLeft = CGPoint(
+                x: widthPadding,
+                y: (boundsHeight - paperHeight)/2
+            )
+        }
+
+        scale = paperHeight/height
+
         drawAll()
     }
 
     func drawPaperBounds() {
-        scale = min(Double(bounds.width)/main.paper.width   - 2*padding,
-                    Double(bounds.height)/main.paper.height - 2*padding)
-        paperWidth  = scale*main.paper.width
-        paperHeight = scale*main.paper.height
-
-        if Double(bounds.width)  - paperWidth
-         > Double(bounds.height) - paperHeight {
-            paperBottomLeft = CGPoint(
-                x: (Double(bounds.width) - paperWidth)/2,
-                y: Double(bounds.height) - paperHeight - (padding as Double)
-            )
-        }
-        else {
-            paperBottomLeft = CGPoint(
-                x: Double(bounds.width) - paperWidth - (padding as Double),
-                y: (Double(bounds.height) - paperHeight)/2
-            )
-        }
         diagram.bounds = CGRect(x: Double(paperBottomLeft.x),
                                 y: Double(paperBottomLeft.y),
                             width: paperWidth,
