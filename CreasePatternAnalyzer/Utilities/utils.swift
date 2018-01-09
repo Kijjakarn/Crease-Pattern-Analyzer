@@ -748,7 +748,7 @@ func makeInstructions(for reference: Reference) {
                 }
                 line.label = "\(lineLabels.popLast()!)"
                 instruction = "(A7) Fold \(point1) onto \(line1) perpendicular"
-                            + " to \(line2), creating \(line)"
+                            + " to \(line2), creating \(line)."
 
                 // Make arrows
                 let arrow = Arrow(
